@@ -221,7 +221,7 @@ rabbit.setChannelPrefetch(*channel*, *prefetch*)
 
 **Ack**
 
-ack(*channel*, *msg*)
+rabbit.ack(*channel*, *msg*)
 
 *msg* is a ZeroRabbitMsg (see above for explanation).
 
