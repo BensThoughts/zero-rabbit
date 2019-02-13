@@ -69,10 +69,11 @@ to omit those things.
 The msg object that pops out of rabbit.consume is a special little object called a ZeroRabbitMsg.  
 
 Within a ZeroRabbitMsg there exists two properties:
-1. msg: which contains the entire msg object as given by libamqp, encoded contents and all.
+
+**msg**: which contains the entire msg object as given by libamqp, encoded contents and all.
 * The full RabbitMQ message can be obtained with msg.getMsg() or msg.msg.
 
-2. content: a JSON deserialized (JSON.parse(msg)) version of the content portion of the message
+**content**: a JSON deserialized (JSON.parse(msg)) version of the content portion of the message
 * The JSON version can be obtained with msg.getJsonMsg() or msg.content.
 
 *So yes this is only really good for sending and receiving JSON messages as of right now.*
