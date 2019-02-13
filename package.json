@@ -1,0 +1,19 @@
+{
+  "name": "zero-rabbit",
+  "version": "0.0.4",
+  "description": "Zero Inbox client library for RabbitMQ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "RabbitMQ",
+    "Client"
+  ],
+  "author": "Benjamin Blumenfeld-Jones",
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "log4js": "^4.0.2"
+  }
+}
