@@ -59,13 +59,13 @@ to omit those things.
 
 **Note:** that you MUST declare a channel for all queues, exchanges, and bindings...This is actually a benefit as you will see (It allows you to consume off of multiple queues at the same time).
 
-**IMPORTANT:** channels are create idempotently and automatically within all function calls and config object declarations, with the *exception* of rabbit.ack(*channel*, *msg*), rabbit.closeChannel(*channel*) and rabbit.cancelChannel(*channel*).  This means that if you misspell a channel name somewhere later on in your code it will result in the creation of a new channel as well as possibly unexpected behavior.
+**IMPORTANT:** channels are created idempotently and automatically within all function calls and config object declarations, with the *exception* of rabbit.ack(*channel*, *msg*), rabbit.closeChannel(*channel*) and rabbit.cancelChannel(*channel*).  This means that if you misspell a channel name somewhere later on in your code it will result in the creation of a new channel as well as possibly unexpected behavior.
 
 ***Channels are created automatically*** either by declaration in a config object or dynamically via functions such as rabbit.assertQueue().
 
 ***Channels can be deleted*** (in other words closed/cancelled) with rabbit.closeChannel() and rabbit.cancelChannel() (see below).
 
-**IMPORTANT:** The first argument of ***ALL*** zero-rabbit functions (i.e. rabbit.consume() as below) is ***ALWAYS*** the channel on which to perform the specified action.  Again if the channel is not already created via the config object or via function calls that dynamically assert a Queue, Exchange, or Binding, a new channel will be created. So to avoid channels accumulating or unexpected behavior try to stick with using as few as you possibly can throughout your app and reuse the same channel where appropriate.
+**IMPORTANT:** The first argument of ***ALL*** zero-rabbit functions (i.e. rabbit.consume() as below) is ***ALWAYS*** the channel on which to perform the specified action.  Again if the channel is not already created via the config object or via a function call, a new channel will be created. So to avoid channels accumulating or unexpected behavior try to stick with using as few as you possibly can throughout your app and reuse the same channel where appropriate (i.e. use the same channel to publish on as you used to create the exchange and use the same channel to consume on as the one you used to create and bind a queue that it reads from).
 
 
 # Zero Rabbit Msg:
