@@ -190,6 +190,8 @@ the msg payload that rabbit.publish(*channel*, *exchange*, *msg*, ...) expects i
     });
 
 
+See below methods for more complicated examples.
+
 # Methods:
 
 **connect**
@@ -223,7 +225,8 @@ ack(*channel*, *msg*)
 
 *msg* is a ZeroRabbitMsg (see above for explanation).
 
-*channel* is the name you gave the channel that the msg came from.  i.e. the same channel that the message was delivered on from whichever rabbit.consume() needs to be the same channel that you ack the message on.
+*channel* is the name you gave the channel that the msg came from (i.e. the same channel that the message was delivered on). The channel that you ack the message on needs to be the same as the channel
+that the message was consumed from.
 
 
 **Assert Exchange**
