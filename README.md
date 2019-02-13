@@ -54,7 +54,7 @@ The feature it implements that I have not seen in any other RabbitMQ client libr
 *options* and *key* are not optional as of right now, just use {} and "" respectively if you want
 to omit those things.
 
-**Note:** that you MUST declare a channel for all queues, exchanges, and bindings...This is actually a benefit as you will see (It allows you to consume off of multiple queues at the same time).
+**Note:** You MUST declare a channel for all queues, exchanges, and bindings...This is actually a benefit as you will see (It allows you to consume off of multiple queues at the same time).
 
 **IMPORTANT:** channels are created idempotently and automatically within all function calls and config object declarations, with the *exception* of rabbit.ack(*channel*, *msg*), rabbit.closeChannel(*channel*) and rabbit.cancelChannel(*channel*).  This means that if you misspell a channel name somewhere later on in your code it will result in the creation of a new channel as well as possibly unexpected behavior.
 
@@ -70,13 +70,13 @@ The msg object that pops out of rabbit.consume is a special little object called
 
 Within a ZeroRabbitMsg there exists two properties:
 
-**msg**: which contains the entire msg object as given by libamqp, encoded contents and all.
-* The full RabbitMQ message can be obtained with msg.getMsg() or msg.msg.
+**msg**: Contains the entire msg object as given by amqplib, encoded contents and all.
+* The full RabbitMQ (amqplib) message can be obtained with msg.getMsg() or msg.msg.
 
-**content**: a JSON deserialized (JSON.parse(msg)) version of the content portion of the message
-* The JSON version can be obtained with msg.getJsonMsg() or msg.content.
+**content**: A JSON deserialized version of the content portion of the message
+* The original message object can be obtained with msg.getJsonMsg() or msg.content.
 
-*So yes this is only really good for sending and receiving JSON messages as of right now.*
+*So yes, Zero Rabbit is only really good for sending and receiving JSON messages as of right now.*
 
 # Examples:
 
@@ -134,7 +134,7 @@ You only need to connect once somewhere in your main module. Once you have conne
 
 *const rabbit = require('zero-rabbit')* and then *rabbit.publish()*.
 
-the msg payload that rabbit.publish(*channel*, *exchange*, *msg*, ...) expects is a JSON object. The internals of ZeroRabbit will stringify and then turn into a Buffer for you before it actually publishes the msg.
+The msg payload that rabbit.publish(*channel*, *exchange*, *msg*, ...) expects is any plain Javascript object. The internals of ZeroRabbit will stringify, turn into a Buffer, and then publish the message over the wire for you.
 
 
 **Receiving (Subscribing):**
@@ -202,7 +202,7 @@ rabbit.publish(*channel*, *exchange*, *message*, *routingKey*, *options*)
 
 *routingKey* and *options* are optional
 
-the msg payload is expected to be a JSON object. The internals of ZeroRabbit will stringify and then turn into a Buffer for you before it actually publishes the msg.
+The msg payload is expected to be a JSON object. The internals of ZeroRabbit will stringify, turn into a Buffer, and then publish/send the message over the wire for you.
 
 **Consume**
 

@@ -1,6 +1,6 @@
 {
   "name": "zero-rabbit",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Zero Inbox client library for RabbitMQ",
   "main": "index.js",
   "homepage": "https://github.com/SanFranciscoSunrise/zero-rabbit",
@@ -18,8 +18,8 @@
   "author": "Benjamin Blumenfeld-Jones",
   "license": "ISC",
   "dependencies": {
+    "amqplib": "^0.5.3",
     "log4js": "^4.0.2"
   },
-  "devDependencies": {
-  }
+  "devDependencies": {}
 }
