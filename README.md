@@ -58,9 +58,9 @@ one queue at a time.
 *options* and *key* are not optional as of right now, just use {} and "" respectively if you want
 to omit those things.
 
-**Note** that you MUST declare a channel for all queues, exchanges, and bindings...This is actually a benifit as you will see (It allows you to consume off of multiple queues at the same time).
+**Note:** that you MUST declare a channel for all queues, exchanges, and bindings...This is actually a benifit as you will see (It allows you to consume off of multiple queues at the same time).
 
-**IMPORTANT:** channels are create idempotently and automatically within all function calls and config object declarations, with the *expection* of rabbit.ack(), rabbit.closeChannel() and rabbit.cancelChannel().  This means that if you mispell a channel name somewhere later on in your code it will result in the creation of a new channel as well as possibly unexpected behavior.
+**IMPORTANT:** channels are create idempotently and automatically within all function calls and config object declarations, with the *expection* of rabbit.ack(*channel*, *msg*), rabbit.closeChannel(*channel*) and rabbit.cancelChannel(*channel*).  This means that if you mispell a channel name somewhere later on in your code it will result in the creation of a new channel as well as possibly unexpected behavior.
 
 *Channels are created* automatically either by declaration in a config object or dynamically via functions such as rabbit.assertQueue(), see complicated examples below for example of assertQueue().
 
@@ -132,9 +132,12 @@ Within a ZeroRabbitMsg there exists two properties:
     
     });
 
-Once you have connected you can publish anywhere in your app. Only need to connect once somewhere in your main module.
 
-*const rabbit = require('zero-rabbit')* and then *rabbit.publish()* anywhere in your app.
+Only need to connect once somewhere in your main module. Once you have connected you can publish anywhere in your app.
+
+*const rabbit = require('zero-rabbit')* and then *rabbit.publish()*.
+
+the msg payload that rabbit.publish(*channel*, *exchange*, *msg*, ...) expects is a JSON object. The internals of ZeroRabbit will stringify and then turn into a Buffer for you before it actually publishes the msg.
 
 
 **Receiving (Subscribing):**
@@ -200,11 +203,16 @@ rabbit.publish(*channel*, *exchange*, *message*, *routingKey*, *options*)
 
 *routingKey* and *options* are optional
 
+the msg payload is expected to be a JSON object. The internals of ZeroRabbit will stringify and then turn into a Buffer for you before it actually publishes the msg.
+
 **Consume**
 
 rabbit.consume(*channel*, *queue*, *options*, *function(msg)*)
 
 *options* are not optional as of right now, just use {} if you do not want to use any options.
+
+*msg* is a ZeroRabbitMsg (see above for explanation). The JSON decoded msg can be obtained with msg.content or msg.getJsonMsg(), the full rabbit msg can be obtained with msg.msg or msg.getMsg()
+
 
 **Set Channel Prefetch**
 
