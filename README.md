@@ -187,7 +187,7 @@ the msg payload that rabbit.publish(*channel*, *exchange*, *msg*, ...) expects i
     });
 
 
-See below methods for more complicated examples.
+See below for more complicated examples.
 
 # Methods:
 
