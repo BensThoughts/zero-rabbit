@@ -2,10 +2,7 @@
 
 Zero Rabbit is a library that I threw together to provide an abstraction over amqplib. It is simple and still a work in progress.
 
-The feature it implements that I have not seen in any other RabbitMQ client
-library is the ability to control which channel you publish/consume on.
-This is very important for applications that need to listen to more than
-one queue at a time.
+The feature it implements that I have not seen in any other RabbitMQ client library is the ability to control which channel you publish/consume on. This is very important for applications that need to listen to more than one queue at a time.
 
 # Config
 
