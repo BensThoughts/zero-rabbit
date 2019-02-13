@@ -132,7 +132,7 @@ Within a ZeroRabbitMsg there exists two properties:
     });
 
 
-Only need to connect once somewhere in your main module. Once you have connected you can publish anywhere in your app.
+You only need to connect once somewhere in your main module. Once you have connected you can publish anywhere in your app.
 
 *const rabbit = require('zero-rabbit')* and then *rabbit.publish()*.
 
@@ -217,7 +217,7 @@ rabbit.consume(*channel*, *queue*, *options*, *function(msg)*)
 
 rabbit.setChannelPrefetch(*channel*, *prefetch*)
 
-**ack**
+**Ack**
 
 ack(*channel*, *msg*)
 
