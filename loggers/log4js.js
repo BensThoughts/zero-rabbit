@@ -23,11 +23,12 @@ const log4js = require('log4js');
             default: { appenders: ['_stdout_prod'], level: 'info' },
             dev: { appenders: [, '_stdout_debug', '_stderr_debug'], level: 'trace' },
             dev_trace: { appenders: ['_stdout_trace', '_stderr_debug'], level: 'trace' },
-            prod: { appenders: ['_stdout_prod', '_stderr_prod'], level: 'trace' }
+            prod: { appenders: ['_stdout_prod', '_stderr_prod'], level: 'trace' },
+            errors: { appenders: ['_stderr_prod'], level: ['info']}
         }
     });
 
 // switch getLogger('prod') for prod
-const logger = log4js.getLogger('dev_trace');
+const logger = log4js.getLogger('errors');
 
 module.exports = logger;
