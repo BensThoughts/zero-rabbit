@@ -1,7 +1,6 @@
 # Zero Rabbit
 
-Zero Rabbit is a libaray that I threw together to provide an abstraction
-over amqplib. It is simple and still a work in progress.
+Zero Rabbit is a library that I threw together to provide an abstraction over amqplib. It is simple and still a work in progress.
 
 The feature it implements that I have not seen in any other RabbitMQ client
 library is the ability to control which channel you publish/consume on.
@@ -58,9 +57,9 @@ one queue at a time.
 *options* and *key* are not optional as of right now, just use {} and "" respectively if you want
 to omit those things.
 
-**Note:** that you MUST declare a channel for all queues, exchanges, and bindings...This is actually a benifit as you will see (It allows you to consume off of multiple queues at the same time).
+**Note:** that you MUST declare a channel for all queues, exchanges, and bindings...This is actually a benefit as you will see (It allows you to consume off of multiple queues at the same time).
 
-**IMPORTANT:** channels are create idempotently and automatically within all function calls and config object declarations, with the *expection* of rabbit.ack(*channel*, *msg*), rabbit.closeChannel(*channel*) and rabbit.cancelChannel(*channel*).  This means that if you mispell a channel name somewhere later on in your code it will result in the creation of a new channel as well as possibly unexpected behavior.
+**IMPORTANT:** channels are create idempotently and automatically within all function calls and config object declarations, with the *exception* of rabbit.ack(*channel*, *msg*), rabbit.closeChannel(*channel*) and rabbit.cancelChannel(*channel*).  This means that if you misspell a channel name somewhere later on in your code it will result in the creation of a new channel as well as possibly unexpected behavior.
 
 *Channels are created* automatically either by declaration in a config object or dynamically via functions such as rabbit.assertQueue(), see complicated examples below for example of assertQueue().
 
@@ -147,7 +146,7 @@ the msg payload that rabbit.publish(*channel*, *exchange*, *msg*, ...) expects i
     const conf =  {
 
         "connection": {
-            // ...conection object
+            // ...connection object
         },
         "exchanges" : [
             {
@@ -231,19 +230,19 @@ ack(*channel*, *msg*)
 
 rabbit.assertExchange(*channel*, *exchange*, *type*, *options*, *function(err, ex)*)
 
-function(err, ex) can be omited as can options, but if you are asserting an exchange you probably want to make sure it has succeeded before proceeding.
+function(err, ex) can be omitted as can options, but if you are asserting an exchange you probably want to make sure it has succeeded before proceeding.
 
 **Assert Queue**
 
 rabbit.assertQueue(*channel*, *queue*, *options*, *function(err, q)*)
 
-function(err, q) can be omited as can options, but if you are asserting a queue you probably want to make sure it has succeeded before proceeding.
+function(err, q) can be omitted as can options, but if you are asserting a queue you probably want to make sure it has succeeded before proceeding.
 
 **Bind Queue**
 
 rabbit.bindQueue(*channel*, *queue*, *exchange*, *key*, *options*, *function(err, ok)*)
 
-function(err, ok) can be omited as can options, but if you are binding a queue you probably want to make sure it has succeeded before proceeding.  key must be included but can be set to "" if you don't need it.
+function(err, ok) can be omitted as can options, but if you are binding a queue you probably want to make sure it has succeeded before proceeding.  key must be included but can be set to "" if you don't need it.
 
 Best just to include all arguments and use "" for key and {} for options.
 
@@ -251,7 +250,7 @@ Best just to include all arguments and use "" for key and {} for options.
 
 rabbit.deleteQueue(*channel*, *queue*, *options*, *function(err, ok)*)
 
-*options* and *function(err, ok)* can be omited
+*options* and *function(err, ok)* can be omitted
 
 **Cancel Channel**
 
@@ -277,7 +276,7 @@ This will close the channel (apparently should rarely be needed).  I'm still try
     const conf =  {
 
         "connection": {
-            // ...conection object
+            // ...connection object
         },
         "exchanges" : [
             {
@@ -350,7 +349,7 @@ This will close the channel (apparently should rarely be needed).  I'm still try
     const conf =  {
 
         "connection": {
-            // ...conection object
+            // ...connection object
         },
         "exchanges" : [
             {
