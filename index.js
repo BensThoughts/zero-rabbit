@@ -121,8 +121,8 @@ class ZeroRabbit {
         if (cb) {
           cb(err, ok);
         }
-      })
-    })
+      });
+    });
   }
 
   /**
@@ -152,7 +152,7 @@ class ZeroRabbit {
    * a new channel if one is not already stored. This is an async
    * operation that will wait for the new channel to be created
    * so that all other operations after that use the same channel
-   * name will find the chanel in the Map object.
+   * name will find the channel in the Map object.
    * 
    * @param {string} channelName - the name of the channel
    * @param {function} cb - a callback function 
