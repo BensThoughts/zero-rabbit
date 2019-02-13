@@ -400,7 +400,7 @@ This will close the channel (apparently should rarely be needed).  I'm still try
             some_data: transformed_data
         }
 
-        rabbit.publish('myapp.send.1', 'myapp.ex.1', transformed_data);
+        rabbit.publish('myapp.send.1', 'myapp.ex.1', transformed_message);
       });
 
     });
