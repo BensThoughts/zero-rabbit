@@ -262,17 +262,26 @@ rabbit.deleteQueue(*channel*, *queue*, *options*, *function(err, ok)*)
 
 *options* and *function(err, ok)* can be omitted
 
+**Get Channel**
+
+rabbit.getChannel(*channel*, *function(err, ch)*)
+
+This will retrieve the channel object from memory.  This should not be needed unless you want to do something over a channel that Zero Rabbit currently does not do. This will be the same channel object
+that amqplib gives so all possibilities are open with this.
+
 **Cancel Channel**
 
 rabbit.cancelChannel(*channel*)
 
-This will stop the rabbit.consume() loop that the channel was declared in.
+This will stop the rabbit.consume() loop that the channel was declared in. It will *not* delete the channel from memory.
 
 **Close Channel**
 
 rabbit.closeChannel(*channel*)
 
-This will close the channel (apparently should rarely be needed).  I'm still trying to figure out cancel vs. close and right now in my own code using cancel followed by close.
+This will close the channel. It will also delete the channel object from memory.
+
+I'm still trying to figure out cancel vs. close and right now in my own code I'm using cancelChannel() followed by closeChannel().
 
 
 
