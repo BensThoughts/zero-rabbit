@@ -8,51 +8,57 @@ The feature it implements that I have not seen in any other RabbitMQ client libr
 
     const conf = {
 
-        "connection": {
-            "protocol": "amqp",
-            "hostname": "rabbitmq",
-            "port": 5672,
-            "username": "guest",
-            "password": "guest",
-            "locale": "en_US",
-            "frameMax": 0,
-            "heartbeat": 60,
-            "vhost": "/"
+        connection: {
+            protocol: 'amqp',
+            hostname: 'rabbitmq',
+            port: 5672,
+            username: 'guest',
+            password: 'guest',
+            locale: 'en_US',
+            frameMax: 0,
+            heartbeat: 60,
+            vhost: '/'
         },
-        "exchanges" : [
+        exchanges : [
             {
-                "channel": "batch.listen.1",
-                "name": "user.ids.ex.1",
-                "type": "fanout",
-                "options": {}
+                channel: 'batch.listen.1',
+                name: 'user.ids.ex.1',
+                type: 'fanout',
+                options: {}
             },
             {
-                "channel": "batch.listen.1",
-                "name": "threadIds.topic.ex.1",
-                "type": "topic",
-                "options": {}
+                channel: 'batch.listen.1',
+                name: 'threadIds.topic.ex.1',
+                type: 'topic',
+                options: {}
             }
         ],
-        "queues": [
+        queues: [
             {
-                "channel": "batch.listen.1",
-                "name": "batch.user.id.q.1",
-                "options": { "autoDelete": false }
+                channel: 'batch.listen.1',
+                name: 'batch.user.id.q.1',
+                options: { 'autoDelete': false }
             }
         ],
-        "bindings": [
+        bindings: [
             {
-                "channel": "batch.listen.1",
-                "queue": "batch.user.id.q.1",
-                "exchange": "user.ids.ex.1",
-                "key": "",
-                "options": {}
+                channel: 'batch.listen.1',
+                queue: 'batch.user.id.q.1',
+                exchange: 'user.ids.ex.1',
+                key: '',
+                options: {}
             }
         ]
     }
 
-*options* and *key* are not optional as of right now, just use {} and "" respectively if you want
+*options* and *key* are not optional as of right now, just use {} and '' respectively if you want
 to omit those things.
+
+Optionally you can include a url parameter instead of the connection parameter above, like so:
+
+    let conf = {
+        url: 'amqp://localhost:5672'
+    }
 
 **Note:** You MUST declare a channel for all queues, exchanges, and bindings...This is actually a benefit as you will see (It allows you to consume off of multiple queues at the same time).
 
@@ -89,23 +95,23 @@ Within a ZeroRabbitMsg there exists two properties:
     const rabbit = require('zero-rabbit');
 
     let conf = {
-        "connection": {
-                "protocol": "amqp",
-                "hostname": "localhost",
-                "port": 5672,
-                "username": "guest",
-                "password": "guest",
-                "locale": "en_US",
-                "frameMax": 0,
-                "heartbeat": 60,
-                "vhost": "/"
+        connection: {
+                protocol: 'amqp',
+                hostname: 'localhost',
+                port: 5672,
+                username: 'guest',
+                password: 'guest',
+                locale: 'en_US',
+                frameMax: 0,
+                heartbeat: 60,
+                vhost: '/'
         },
-        "exchanges" : [
+        exchanges : [
             {
-                "channel": "myapp.send.1",
-                "name": "myapp.ex.1",
-                "type": "direct",
-                "options": {}
+                channel: 'myapp.send.1',
+                name: 'myapp.ex.1',
+                type: 'direct',
+                options: {}
             }
         ],
     }
@@ -147,33 +153,32 @@ The msg payload that rabbit.publish(*channel*, *exchange*, *msg*, ...) expects i
 
     const conf =  {
 
-        "connection": {
-            // ...connection object
-        },
-        "exchanges" : [
+        url: 'amqp://localhost:5672',
+        exchanges : [
             {
-                "channel": "myapp.listen.1",
-                "name": "myapp.ex.1",
-                "type": "direct",
-                "options": {}
+                channel: 'myapp.listen.1',
+                name: 'myapp.ex.1',
+                type: 'direct',
+                options: {}
             },
         ],
-        "queues": [
+        queues: [
             {
-                "channel": "myapp.listen.1",
-                "name": "myapp.q.1",
-                "options": { "autoDelete": true }
+                channel: 'myapp.listen.1',
+                name: 'myapp.q.1',
+                options: { 'autoDelete': true }
             }
         ],
-        "bindings": [
+        bindings: [
             {
-                "channel": "myapp.listen.1",
-                "queue": "myapp.q.1",
-                "exchange": "myapp.ex.1",
-                "key": "",
-                "options": {}
+                channel: 'myapp.listen.1',
+                queue: 'myapp.q.1',
+                exchange: 'myapp.ex.1',
+                key: '',
+                options: {}
             }
         ]
+
     }
 
     rabbit.connect(conf, (err, conn) => {
@@ -247,9 +252,9 @@ function(err, q) can be omitted as can options, but if you are asserting a queue
 
 rabbit.bindQueue(*channel*, *queue*, *exchange*, *key*, *options*, *function(err, ok)*)
 
-function(err, ok) can be omitted as can options, but if you are binding a queue you probably want to make sure it has succeeded before proceeding.  key must be included but can be set to "" if you don't need it.
+function(err, ok) can be omitted as can options, but if you are binding a queue you probably want to make sure it has succeeded before proceeding.  key must be included but can be set to '' if you don't need it.
 
-Best just to include all arguments and use "" for key and {} for options.
+Best just to include all arguments and use '' for key and {} for options.
 
 **Delete Queue**
 
@@ -280,49 +285,48 @@ This will close the channel (apparently should rarely be needed).  I'm still try
 
     const conf =  {
 
-        "connection": {
-            // ...connection object
-        },
-        "exchanges" : [
+        // ...connection object or url
+
+        exchanges : [
             {
-                "channel": "myapp.listen.1",
-                "name": "myapp.ex.1",
-                "type": "direct",
-                "options": {}
+                channel: 'myapp.listen.1',
+                name: 'myapp.ex.1',
+                type: 'direct',
+                options: {}
             },
             {
-                "channel": "myapp.listen.2",
-                "name": "myapp.ex.2",
-                "type": "direct",
-                "options": {}
+                channel: 'myapp.listen.2',
+                name: 'myapp.ex.2',
+                type: 'direct',
+                options: {}
             }
         ],
-        "queues": [
+        queues: [
             {
-                "channel": "myapp.listen.1",
-                "name": "myapp.q.1",
-                "options": { "autoDelete": true }
+                channel: 'myapp.listen.1',
+                name: 'myapp.q.1',
+                options: { 'autoDelete': true }
             },
             {
-                "channel": "myapp.listen.2",
-                "name": "myapp.q.2",
-                "options": { "autoDelete": true }
+                channel: 'myapp.listen.2',
+                name: 'myapp.q.2',
+                options: { 'autoDelete': true }
             },
         ],
-        "bindings": [
+        bindings: [
             {
-                "channel": "myapp.listen.1",
-                "queue": "myapp.q.1",
-                "exchange": "myapp.ex.1",
-                "key": "",
-                "options": {}
+                channel: 'myapp.listen.1',
+                queue: 'myapp.q.1',
+                exchange: 'myapp.ex.1',
+                key: '',
+                options: {}
             },
             {
-                "channel": "myapp.listen.2",
-                "queue": "myapp.q.2",
-                "exchange": "myapp.ex.2",
-                "key": "",
-                "options": {}
+                channel: 'myapp.listen.2',
+                queue: 'myapp.q.2',
+                exchange: 'myapp.ex.2',
+                key: '',
+                options: {}
             }
         ]
     }
@@ -345,7 +349,7 @@ This will close the channel (apparently should rarely be needed).  I'm still try
         console.log(JsonContent2);
       });
 
-   });
+    });
 
 **Example of Receiving from a queue on one channel and publishing on another channel**
 
@@ -353,37 +357,36 @@ This will close the channel (apparently should rarely be needed).  I'm still try
 
     const conf =  {
 
-        "connection": {
-            // ...connection object
-        },
-        "exchanges" : [
+        // ...connection object or url
+        
+        exchanges : [
             {
-                "channel": "myapp.send.1",
-                "name": "myapp.ex.1",
-                "type": "fanout",
-                "options": {}
+                channel: 'myapp.send.1',
+                name: 'myapp.ex.1',
+                type: 'fanout',
+                options: {}
             },
             {
-                "channel": "myapp.listen.1",
-                "name": "someOtherApp.ex.1",
-                "type": "direct",
-                "options": {}
+                channel: 'myapp.listen.1',
+                name: 'someOtherApp.ex.1',
+                type: 'direct',
+                options: {}
             },
         ],
-        "queues": [
+        queues: [
             {
-                "channel": "myapp.listen.1",
-                "name": "myapp.q.1",
-                "options": { "autoDelete": true }
+                channel: 'myapp.listen.1',
+                name: 'myapp.q.1',
+                options: { 'autoDelete': true }
             }
         ],
-        "bindings": [
+        bindings: [
             {
-                "channel": "myapp.listen.1",
-                "queue": "myapp.q.1",
-                "exchange": "someOtherApp.ex.1",
-                "key": "",
-                "options": {}
+                channel: 'myapp.listen.1',
+                queue: 'myapp.q.1',
+                exchange: 'someOtherApp.ex.1',
+                key: '',
+                options: {}
             }
         ]
     }

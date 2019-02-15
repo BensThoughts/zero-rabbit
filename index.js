@@ -1,5 +1,5 @@
 const amqp = require('amqplib/callback_api');
-const logger = require('./loggers/log4js');
+const debug = require('debug')('zero-rabbit');
 
 
 var util = require('util');
@@ -25,22 +25,39 @@ class ZeroRabbit {
   }
   
   connect(opts, cb) {
-    amqp.connect(opts.connection, (err, conn) => {
-      let protocol = opts.connection.protocol;
-      let hostname = opts.connection.hostname;
-      let port = opts.connection.port;
-      logger.info('Connected to RabbitMQ: ' + protocol + '://' + hostname + ':' + port);
+    debug('test2');
+    let connection;
+    if (opts.connection && opts.url) {
+      throw new Error('Config must include one of "connection" or "url", but not both!');
+    }
+    if (opts.connection) {
+      connection = opts.connection;
+    } else if (opts.url) {
+      connection = opts.url
+    } else {
+      throw new Error('"connection" or "url" not found in configuration: please include one!');
+    }
+
+    amqp.connect(connection, (err, conn) => {
+      if (opts.connection) {
+        let protocol = opts.connection.protocol;
+        let hostname = opts.connection.hostname;
+        let port = opts.connection.port;
+        debug('Connected to RabbitMQ: ' + protocol + '://' + hostname + ':' + port);
+      } else {
+        debug('Connected to RabbitMQ: ' + opts.url)
+      }
 
       this.rabbitConn = conn;
 
       this.setupTopology(opts).then(() => {
-        logger.trace('Chanels opened: ' + this.channels.size);
+        debug('Channels opened: ' + this.channels.size);
       
         if (cb) {
           cb(err, conn);
         }
 
-      }).catch((err) => logger.error(err));
+      });
  
     });
   };
@@ -79,9 +96,9 @@ class ZeroRabbit {
         if (cb) {
           cb(err,ch)
         } else {
-          if (err) return logger.error('Error in RabbitMQ.assertExchange(): ' + err);
+          if (err) throw new Error('Error in assertExchange(): ' + err);
           let exInfo = util.inspect(ex);
-          logger.info('assertExchange on channel ' + channel + ': ' + exInfo);
+          debug('assertExchange on channel ' + channel + ': ' + exInfo);
         }
       });
     });
@@ -93,9 +110,9 @@ class ZeroRabbit {
         if (cb) {
           cb(err, q);
         } else {
-          if (err) return logger.error('Error in RabbitMQ.assertQueue(): ' + err);
+          if (err) throw new Error('Error in ZeroRabbit.assertQueue(): ' + err);
           let qInfo = util.inspect(q);
-          logger.info('assertQueue on channel ' + channel + ': ' + qInfo);
+          debug('assertQueue on channel ' + channel + ': ' + qInfo);
         }
       });
     });
@@ -107,8 +124,8 @@ class ZeroRabbit {
         if (cb) {
           cb(err, ok);
         } else {
-          if (err) return logger.error('Error in RabbitMQ.bindQueue(): ' + err);
-          logger.info('bind Queue ' + qName + ' to ' + exName + ' on channel ' + channel);
+          if (err) throw new Error('Error in RabbitMQ.bindQueue(): ' + err);
+          debug('bind Queue ' + qName + ' to ' + exName + ' on channel ' + channel);
         }
       });
     });
@@ -117,9 +134,10 @@ class ZeroRabbit {
   async deleteQueue(channel, qName, options, cb) {
     await this.getChannel(channel, (err, ch) => {
       ch.deleteQueue(qName, options, (err, ok) => {
-        if (err) logger.error(err);
         if (cb) {
           cb(err, ok);
+        } else {
+          if (err) throw new Error('Error deleting queue: ' + err);
         }
       });
     });
@@ -161,11 +179,16 @@ class ZeroRabbit {
     let channel = this.channels.get(channelName);
     if (channel === undefined) {
       await this.createConfirmChannelPromise(channelName).then((ch) => {
-        logger.info('Created Confirm Channel: ' + channelName);
-        cb(undefined, ch); 
+        debug('Created Confirm Channel: ' + channelName);
+        if (cb) {
+          cb(undefined, ch);
+        } 
       }).catch(err => {
-        logger.error('Error creating channel: ' + err);
-        cb(err, undefined);
+        if (cb) {
+          cb(err, undefined);
+        } else {
+          throw new Error('Error creating channel: ' + err);
+        }
       });
     } else {
       cb(undefined, channel);
@@ -188,13 +211,13 @@ class ZeroRabbit {
   async consume(channel, qName, options, cb) {
     await this.getChannel(channel, (err, ch) => {
       let optionsMsg = util.inspect(options);
-      logger.info('Listenting on channel ' + channel + ' to: ' + qName + ' with options: ' + optionsMsg);
+      debug('Listenting on channel ' + channel + ' to: ' + qName + ' with options: ' + optionsMsg);
       ch.consume(qName, (msg) => {
         let message = new ZeroRabbitMsg(msg);
         cb(message);
       }, options, (err, ok) => {
         if (err) {
-          logger.error(err)
+          throw new Error(err)
         } else {
           let consumerTag = ok.consumerTag;
           this.consumerTags.set(channel, consumerTag);
@@ -206,32 +229,20 @@ class ZeroRabbit {
   // when ack we Don't getChannel() (which is imdepotent) because the channel had
   // better already have been created if we are acking, right?
   ack(channel, msg) {
-    try {
     let message = msg.getMsg();
     this.channels.get(channel).ack(message);
-    } catch(err) {
-      logger.error('Error in RabbitMQ.ack()' + err);
-    }
   }
 
   closeChannel(channel) {
-    try {
-      let ch = this.channels.get(channel);
-      ch.close();
-      this.channels.delete(channel);
-    } catch(err) {
-      logger.error('Error in RabbitMQ.closeChannel()' + err);
-    }
+    let ch = this.channels.get(channel);
+    ch.close();
+    this.channels.delete(channel);
   } 
   
   cancelChannel(channel) {
-    try {
-      let consumerTag = this.consumerTags.get(channel);
-      let ch = this.channels.get(channel);
-      ch.cancel(consumerTag);
-    } catch(err) {
-      logger.error('Error in RabbitMQ.cancelChannel()' + err);
-    }
+    let consumerTag = this.consumerTags.get(channel);
+    let ch = this.channels.get(channel);
+    ch.cancel(consumerTag);
   }
   
 }
