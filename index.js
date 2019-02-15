@@ -24,8 +24,7 @@ class ZeroRabbit {
     this.consumerTags = new Map();
   }
   
-  connect(opts, cb) {
-    debug('test2');
+  connect(opts, callback) {
     let connection;
     if (opts.connection && opts.url) {
       throw new Error('Config must include one of "connection" or "url", but not both!');
@@ -39,26 +38,33 @@ class ZeroRabbit {
     }
 
     amqp.connect(connection, (err, conn) => {
-      if (opts.connection) {
-        let protocol = opts.connection.protocol;
-        let hostname = opts.connection.hostname;
-        let port = opts.connection.port;
-        debug('Connected to RabbitMQ: ' + protocol + '://' + hostname + ':' + port);
-      } else {
-        debug('Connected to RabbitMQ: ' + opts.url)
-      }
-
-      this.rabbitConn = conn;
-
-      this.setupTopology(opts).then(() => {
-        debug('Channels opened: ' + this.channels.size);
-      
+      if (err) {
         if (cb) {
-          cb(err, conn);
+          cb(err, undefined);
+        } else {
+          throw new Error('Error creating connection: ' + err);
         }
+      } else {
+        if (opts.connection) {
+          let protocol = opts.connection.protocol;
+          let hostname = opts.connection.hostname;
+          let port = opts.connection.port;
+          debug('Connected to RabbitMQ: ' + protocol + '://' + hostname + ':' + port);
+        } else {
+          debug('Connected to RabbitMQ: ' + opts.url)
+        }
+        
+        this.rabbitConn = conn;
 
-      });
- 
+        this.setupTopology(opts).then(() => {
+          debug('Channels opened: ' + this.channels.size);
+      
+          if (callback) {
+            callback(err, conn);
+          }
+
+        });
+      }
     });
   };
 
@@ -90,56 +96,56 @@ class ZeroRabbit {
   
   }
 
-  async assertExchange(channel, exName, type, options, cb) {
-    await this.getChannel(channel, (err, ch) => {
-      ch.assertExchange(exName, type, options, (err, ex) => {
-        if (cb) {
-          cb(err,ch)
-        } else {
-          if (err) throw new Error('Error in assertExchange(): ' + err);
-          let exInfo = util.inspect(ex);
-          debug('assertExchange on channel ' + channel + ': ' + exInfo);
-        }
-      });
+  async assertExchange(channelName, exName, type, options, callback) {
+    let ch = await this.getChannel(channelName);
+    ch.assertExchange(exName, type, options, (err, ex) => {
+      if (callback) {
+        callback(err,ex)
+      } else {
+        if (err) throw new Error('Error in assertExchange(): ' + err);
+        let exInfo = util.inspect(ex);
+        debug('assertExchange on channel ' + channelName + ': ' + exInfo);
+      }
     });
   }
 
-  async assertQueue(channel, qName, options, cb) {
-    await this.getChannel(channel, (err, ch) => {
-      ch.assertQueue(qName, options, (err, q) => {
-        if (cb) {
-          cb(err, q);
-        } else {
-          if (err) throw new Error('Error in ZeroRabbit.assertQueue(): ' + err);
-          let qInfo = util.inspect(q);
-          debug('assertQueue on channel ' + channel + ': ' + qInfo);
-        }
-      });
+  async assertQueue(channelName, qName, options, callback) {
+    let ch = await this.getChannel(channelName);
+    ch.assertQueue(qName, options, (err, q) => {
+      if (callback) {
+        callback(err, q);
+      } else {
+        if (err) throw new Error('Error in ZeroRabbit.assertQueue(): ' + err);
+        let qInfo = util.inspect(q);
+        debug('assertQueue on channel ' + channelName + ': ' + qInfo);
+      }
     });
   }
 
-  async bindQueue(channel, qName, exName, key, options, cb) {
-    await this.getChannel(channel, (err, ch) => {
-      ch.bindQueue(qName, exName, key, options, (err, ok) => {
-        if (cb) {
-          cb(err, ok);
-        } else {
-          if (err) throw new Error('Error in RabbitMQ.bindQueue(): ' + err);
-          debug('bind Queue ' + qName + ' to ' + exName + ' on channel ' + channel);
-        }
-      });
+  async bindQueue(channelName, qName, exName, key, options, callback) {
+    let ch = await this.getChannel(channelName);
+    ch.bindQueue(qName, exName, key, options, (err, ok) => {
+      if (callback) {
+        callback(err, ok);
+      } else {
+        if (err) throw new Error('Error in RabbitMQ.bindQueue(): ' + err);
+        debug('Bind queue: ' + qName + ' to ' + exName + ' on channel ' + channelName);
+        debug('Bound ' + qName + ' with key: ' + key);
+        debug('Bound ' + qName + ' with options: ' + options)
+      }
     });
   }
 
-  async deleteQueue(channel, qName, options, cb) {
-    await this.getChannel(channel, (err, ch) => {
-      ch.deleteQueue(qName, options, (err, ok) => {
-        if (cb) {
-          cb(err, ok);
-        } else {
-          if (err) throw new Error('Error deleting queue: ' + err);
-        }
-      });
+  async deleteQueue(channelName, qName, options, callback) {
+    let ch = await this.getChannel(channelName);
+    ch.deleteQueue(qName, options, (err, ok) => {
+      if (callback) {
+        callback(err, ok);
+      } else {
+        if (err) throw new Error('Error deleting queue: ' + err);
+        debug('Deleted queue ' + qName + ' on channel ' + channelName);
+        debug('Deleted queue with options ' + options);
+      }
     });
   }
 
@@ -172,76 +178,82 @@ class ZeroRabbit {
    * so that all other operations after that use the same channel
    * name will find the channel in the Map object.
    * 
+   * If this is called externally it will pass (err, ch) to the callback
+   * for handling. Internally this is used without callback and so will 
+   * just throw a new error if the channel fails to be created.
+   * 
    * @param {string} channelName - the name of the channel
-   * @param {function} cb - a callback function 
+   * @param {function} callback - a callback function 
    */
-  async getChannel(channelName, cb) {
-    let channel = this.channels.get(channelName);
-    if (channel === undefined) {
-      await this.createConfirmChannelPromise(channelName).then((ch) => {
-        debug('Created Confirm Channel: ' + channelName);
-        if (cb) {
-          cb(undefined, ch);
-        } 
-      }).catch(err => {
-        if (cb) {
-          cb(err, undefined);
+  async getChannel(channelName, callback) {
+    let ch = this.channels.get(channelName);
+    if (ch === undefined) {
+      ch = await this.createConfirmChannelPromise(channelName).catch(err => {
+        if (callback) {
+          callback(err, undefined);
         } else {
           throw new Error('Error creating channel: ' + err);
         }
       });
+      if (callback) {
+        callback(undefined, ch)
+      } else {
+        debug('Created confirm channel: ' + channelName);
+        return ch;
+      }
+    } else if(callback) {
+      callback(undefined, ch);
     } else {
-      cb(undefined, channel);
+      debug('Retrieved confirm channel from this.channels');
+      return ch;
     }
   }
 
-  async setChannelPrefetch(channel, prefetch) {
-    await this.getChannel(channel, (err, ch) => {
-      ch.prefetch(prefetch);
-    });
+  async setChannelPrefetch(channelName, prefetch) {
+    let ch = await this.getChannel(channelName);
+    ch.prefetch(prefetch);
   }
 
-  async publish(channel, exName, msg, routingKey, options) {
+  async publish(channelName, exName, msg, routingKey, options) {
     msg = JSON.stringify(msg);
-    await this.getChannel(channel, (err, ch) => {
-      ch.publish(exName, routingKey || '', new Buffer(msg), options || {});
-    });
+    let ch = await this.getChannel(channelName);
+    ch.publish(exName, routingKey || '', new Buffer(msg), options || {});
   }
 
-  async consume(channel, qName, options, cb) {
-    await this.getChannel(channel, (err, ch) => {
-      let optionsMsg = util.inspect(options);
-      debug('Listenting on channel ' + channel + ' to: ' + qName + ' with options: ' + optionsMsg);
-      ch.consume(qName, (msg) => {
+  async consume(channelName, qName, options, callback) {
+    let ch = await this.getChannel(channelName);
+    let optionsMsg = util.inspect(options);
+    debug('Listenting on channel ' + channelName + ' to: ' + qName + ' with options: ' + optionsMsg);
+    ch.consume(qName, (msg) => {
         let message = new ZeroRabbitMsg(msg);
-        cb(message);
+        callback(message);
       }, options, (err, ok) => {
         if (err) {
           throw new Error(err)
         } else {
           let consumerTag = ok.consumerTag;
-          this.consumerTags.set(channel, consumerTag);
+          this.consumerTags.set(channelName, consumerTag);
         };
-      })
-    });
+      });
   }
 
   // when ack we Don't getChannel() (which is imdepotent) because the channel had
   // better already have been created if we are acking, right?
-  ack(channel, msg) {
+  ack(channelName, msg) {
     let message = msg.getMsg();
-    this.channels.get(channel).ack(message);
+    let ch = this.channels.get(channelName)
+    ch.ack(message);
   }
 
-  closeChannel(channel) {
-    let ch = this.channels.get(channel);
+  closeChannel(channelName) {
+    let ch = this.channels.get(channelName);
     ch.close();
-    this.channels.delete(channel);
+    this.channels.delete(channelName);
   } 
   
-  cancelChannel(channel) {
-    let consumerTag = this.consumerTags.get(channel);
-    let ch = this.channels.get(channel);
+  cancelChannel(channelName) {
+    let consumerTag = this.consumerTags.get(channelName);
+    let ch = this.channels.get(channelName);
     ch.cancel(consumerTag);
   }
   
@@ -269,49 +281,53 @@ class ZeroRabbitMsg {
   }
 }
 
-const aRabbit = new ZeroRabbit();
+const zeroRabbit = new ZeroRabbit();
 
-exports.connect = function connect(opts, cb) {
-  aRabbit.connect(opts, cb);
+exports.connect = function connect(opts, callback) {
+  zeroRabbit.connect(opts, callback);
 }
 
-exports.consume = function consume(channel, qName, options, cb) {
-  aRabbit.consume(channel, qName, options, cb);
+exports.consume = function consume(channelName, qName, options, callback) {
+  zeroRabbit.consume(channelName, qName, options, callback);
 };
 
 
-exports.publish = function publish(channel, exName, msg, routingKey, options) {
-  aRabbit.publish(channel, exName, msg, routingKey, options);
+exports.publish = function publish(channelName, exName, msg, routingKey, options) {
+  zeroRabbit.publish(channelName, exName, msg, routingKey, options);
 }
 
-exports.ack = function ack(channel, msg) {
-  aRabbit.ack(channel, msg);
+exports.ack = function ack(channelName, msg) {
+  zeroRabbit.ack(channelName, msg);
 }
 
-exports.setChannelPrefetch = function setChannelPrefetch(channel, prefetch) {
-  aRabbit.setChannelPrefetch(channel, prefetch);
+exports.setChannelPrefetch = function setChannelPrefetch(channelName, prefetch) {
+  zeroRabbit.setChannelPrefetch(channelName, prefetch);
 }
 
-exports.assertQueue = function assertQueue(channel, qName, options, cb) {
-  aRabbit.assertQueue(channel, qName, options, cb);
+exports.assertQueue = function assertQueue(channelName, qName, options, callback) {
+  zeroRabbit.assertQueue(channelName, qName, options, callback);
 }
 
-exports.deleteQueue = function deleteQueue(channel, qName, options, cb) {
-  aRabbit.deleteQueue(channel, qName, options, cb);
+exports.deleteQueue = function deleteQueue(channelName, qName, options, callback) {
+  zeroRabbit.deleteQueue(channelName, qName, options, callback);
 }
 
-exports.assertExchange = function assertExchange(channel, exName, type, options, cb) {
-  aRabbit.assertExchange(channel, exName, type, options, cb)
+exports.assertExchange = function assertExchange(channelName, exName, type, options, callback) {
+  zeroRabbit.assertExchange(channelName, exName, type, options, callback)
 }
 
-exports.bindQueue = function bindQueue(channel, qName, exName, key, options, cb) {
-  aRabbit.bindQueue(channel, qName, exName, key, options, cb);
+exports.bindQueue = function bindQueue(channelName, qName, exName, key, options, callback) {
+  zeroRabbit.bindQueue(channelName, qName, exName, key, options, callback);
 }
 
-exports.closeChannel = function closeChannel(channel) {
-  aRabbit.closeChannel(channel);
+exports.closeChannel = function closeChannel(channelName) {
+  zeroRabbit.closeChannel(channelName);
 }
 
-exports.cancelChannel = function cancelChannel(channel) {
-  aRabbit.cancelChannel(channel);
+exports.cancelChannel = function cancelChannel(channelName) {
+  zeroRabbit.cancelChannel(channelName);
+}
+
+exports.getChannel = function getChannel(channelName, callback) {
+  zeroRabbit.getChannel(channelName, callback);
 }
