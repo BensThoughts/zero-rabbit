@@ -14,30 +14,30 @@ let conf = {
     },
     exchanges : [
         {
-            channel: "threads.listen.1",
-            name: "user.ids.ex.1",
+            channel: "test.send.1",
+            name: "test.ex.1",
             type: "fanout",
             options: {}
         },
         {
-            channel: "threads.send.1",
-            name: "user.threadIds.topic.ex.1",
+            channel: "test.send.2",
+            name: "test.ex.2",
             type: "topic",
             options: {}
         }
     ],
     queues: [
         {
-            channel: "threads.listen.2",
-            name: "threads.user.id.q.1",
+            channel: "test.listen.1",
+            name: "test.q.1",
             options: { "autoDelete": false }
         }
     ],
     bindings: [
         {
-            channel: "threads.listen.3",
-            queue: "threads.user.id.q.1",
-            exchange: "user.ids.ex.1",
+            channel: "test.send.1",
+            queue: "test.q.1",
+            exchange: "test.ex.1",
             key: "",
             options: {}
         }
@@ -48,5 +48,11 @@ let conf = {
 
 
 rabbit.connect(conf, (err, conn) => {
-
+    rabbit.getChannel('threads.listen.3', (err, ch) => {
+        let message = {
+            test: 'test'
+        }
+        message = JSON.stringify(message);
+        ch.publish('test.ex.1', '', new Buffer(message))
+    });
 })

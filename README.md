@@ -1,8 +1,8 @@
 # Zero Rabbit
 
-Zero Rabbit is a library that I threw together to provide an abstraction over amqplib. It is simple and still a work in progress.
+The feature that Zero Rabbit implements that I have not seen in any other RabbitMQ client library is the ability to control which channel you publish/consume on. This is very important for applications that need to listen to more than one queue at a time.
 
-The feature it implements that I have not seen in any other RabbitMQ client library is the ability to control which channel you publish/consume on. This is very important for applications that need to listen to more than one queue at a time.
+Otherwise Zero Rabbit mostly just provides an abstraction over amqplib. It is fairly well developed however if you find any issues with it please open them up on the github page.  I am actively maintaining this and would like to make it as resilient as possible.
 
 # Config
 
@@ -266,8 +266,7 @@ rabbit.deleteQueue(*channel*, *queue*, *options*, *function(err, ok)*)
 
 rabbit.getChannel(*channel*, *function(err, ch)*)
 
-This will retrieve the channel object from memory.  This should not be needed unless you want to do something over a channel that Zero Rabbit currently does not do. This will be the same channel object
-that amqplib gives so all possibilities are open with this.
+This will retrieve the channel object from memory.  If the channel has not been created previously it will create a new channel, store it in memory, and then give you back the channel object in the callback.  This will be the same channel object that amqplib gives so all possibilities are open with this. *This should not be needed unless you want to do something over a channel that Zero Rabbit currently does not do.*
 
 **Cancel Channel**
 
@@ -420,3 +419,6 @@ I'm still trying to figure out cancel vs. close and right now in my own code I'm
       });
 
     });
+
+
+In my own code I have utilized Zero Rabbit to dynamically create queues for batch jobs submitted by users such that each user gets their own queue until the batch job is completed (and then their queue is deleted). This has allowed for a single running instance of my app to handle multiple jobs from different users at the same time without holdup. So if a user submits a job that takes 2 minutes and then another user submits a job that takes 5 seconds a single instance of my app can process the 5 second job at the same time as the 2 minute job and not hold up users who have shorter jobs.
