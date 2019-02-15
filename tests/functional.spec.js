@@ -1,7 +1,7 @@
 const rabbit = require('../index');
 
 
-let conf2 = {
+let conf = {
     connection: {
         hostname: 'localhost',
         port: 5672,
@@ -47,6 +47,6 @@ let conf2 = {
 
 
 
-rabbit.connect(conf2, (err, conn) => {
+rabbit.connect(conf, (err, conn) => {
 
 })
