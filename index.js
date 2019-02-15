@@ -217,7 +217,7 @@ class ZeroRabbit {
   async publish(channelName, exName, msg, routingKey, options) {
     msg = JSON.stringify(msg);
     let ch = await this.getChannel(channelName);
-    ch.publish(exName, routingKey || '', new Buffer(msg), options || {});
+    ch.publish(exName, routingKey || '', Buffer.from(msg), options || {});
   }
 
   async consume(channelName, qName, options, callback) {

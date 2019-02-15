@@ -50,9 +50,9 @@ let conf = {
 rabbit.connect(conf, (err, conn) => {
     rabbit.getChannel('threads.listen.3', (err, ch) => {
         let message = {
-            test: 'test'
+            test: 'test23'
         }
         message = JSON.stringify(message);
-        ch.publish('test.ex.1', '', new Buffer(message))
+        ch.publish('test.ex.1', '', Buffer.from(message))
     });
 })
