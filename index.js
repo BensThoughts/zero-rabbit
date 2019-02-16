@@ -71,7 +71,7 @@ class ZeroRabbit {
   /**
    * Sets up the RabbitMQ topology
    * 
-   * @param {Options} opts - An Options Object to be parsed for topology info
+   * @param {} conf - A Conf Object to be parsed for topology info
    *  
    */
   async setupTopology(conf) {
@@ -220,7 +220,7 @@ class ZeroRabbit {
     ch.publish(exName, routingKey || '', Buffer.from(msg), options || {});
   }
 
-  async consume(channelName, qName, options, callback) {
+  async consume(channelName, qName, callback, options) {
     let ch = await this.getChannel(channelName);
     let optionsMsg = util.inspect(options);
     debug('Listenting on channel ' + channelName + ' to: ' + qName + ' with options: ' + optionsMsg);
@@ -320,8 +320,14 @@ exports.connect = function connect(conf, callback) {
   zeroRabbit.connect(conf, callback);
 }
 
-exports.consume = function consume(channelName = 'default', qName = 'default.q', options = {}, callback) {
-  zeroRabbit.consume(channelName, qName, options, callback);
+/**
+ * @param {string} channelName - The name of the channel
+ * @param {string} qName - The name of the queue
+ * @param {function} callback - (msg) => {}
+ * @param {Object} options - Options
+ */
+exports.consume = function consume(channelName, qName, callback, options = {}) {
+  zeroRabbit.consume(channelName, qName, callback, options);
 };
 
 
