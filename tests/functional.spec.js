@@ -57,5 +57,7 @@ rabbit.connect(conf, (err, conn) => {
         console.log(msg);
         rabbit.ack('test.listen.1', msg, false);
     });
+    
+    rabbit.getChannel()
 
 })
