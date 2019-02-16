@@ -1,18 +1,41 @@
 # Zero Rabbit
 
-Official 1.0.0 release:
-    
-    rabbit.consume() is now rabbit.consume(*channel*, *queue*, *function(message)*, *options*)
-
-    *options* has been moved to the last argument so that it is now optional. This also means that all methods have the identical order to the official amqplib method calls.
-
-    Also JSDoc is now implemented, so code completion should be very very friendly to use.
-
-    ...and pretty print the README
-
 Zero Rabbit is a RabbitMQ client library.  At it's core it provides a simple abstraction over amqplib. It is fairly well developed however if you find any issues with it please open them up on the github page.  I am actively maintaining this and would like to make it as resilient as possible.
 
 The feature that Zero Rabbit implements that I have not seen in any other RabbitMQ client library is the ability to control which channel you publish/consume on. This is very important for applications that need to listen to more than one queue at a time.
+
+# Official 1.0.3 release:
+
+**Consume is now:** 
+```javascript
+rabbit.consume(channel, queue, function(message), options)
+```
+***options*** has been moved to the last argument so that it is now optional. This also means that all methods have the identical order to the official amqplib method calls.
+
+**Publish is now:**
+```javascript
+rabbit.publish(channel, exchange, routingKey, message, options)
+```
+***routingKey*** is now not optional.  It is now the third arg and ***message*** is now the fourth. Again to be inline with the official amqplib which does not allow routingKey to be optional.  You must declare it as '' if you don't care about it.
+
+**New Functions:**
+```javascript
+rabbit.sendToQueue(channel, queue, message, options)
+
+rabbit.ackAll(channel)
+
+rabbit.nack(channel, message, allUpTo, requeue)
+
+rabbit.nackAll(channel, requeue)
+
+```
+
+**Also:**
+
+JSDoc is now implemented, so code completion should be very very friendly to use.
+
+...and pretty print the README
+
 
 # Config
 
@@ -71,7 +94,7 @@ Optionally you can include a url parameter instead of the connection object abov
         url: 'amqp://localhost:5672'
     }
 ```
-Technically this is the only required param of the conf, either a url string or connection object.
+Technically a url string or connection object is the only required parameter of a conf object.
 
 
 **Note:** You MUST declare a channel for all queues, exchanges, and bindings...This is actually a benefit as you will see (It allows you to consume off of multiple queues at the same time).
@@ -229,11 +252,28 @@ rabbit.connect(conf, function(err, conn))
 ```
 **Publish**
 ```javascript
-rabbit.publish(channel, exchange, message, routingKey, options)
+rabbit.publish(channel, exchange, routingKey, message, options)
 ```
-*routingKey* and *options* are optional
+*exchange* is the name of the exchange to send to
 
-The message payload is expected to be a JSON object. The internals of ZeroRabbit will stringify, turn into a Buffer, and then publish/send the message over the wire for you.
+*routingKey* is the routingKey
+
+*message* is any JSON compatible Object
+
+*options* is optional
+
+The message payload is expected to be a JSON compatible object. The internals of ZeroRabbit will stringify, turn into a Buffer, and then publish/send the message over the wire for you.
+
+**Send to Queue**
+```javascript
+rabbit.sendToQueue(channel, queue, message, options)
+```
+*queue* is the name of the queue
+
+*message* is any JSON compatible Object (see rabbit.publish above)
+
+*options* are optional
+
 
 **Consume**
 ```javascript

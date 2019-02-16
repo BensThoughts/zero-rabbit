@@ -214,10 +214,16 @@ class ZeroRabbit {
     ch.prefetch(prefetch);
   }
 
-  async publish(channelName, exName, JsonMessage, routingKey = '', options = {}) {
+  async publish(channelName, exName, routingKey, JsonMessage, options = {}) {
     let msg = JSON.stringify(JsonMessage);
     let ch = await this.getChannel(channelName);
     ch.publish(exName, routingKey, Buffer.from(msg), options);
+  }
+
+  async sendToQueue(channelName, qName, JsonMessage, options = {}) {
+    let msg = JSON.stringify(JsonMessage);
+    let ch = await this.getChannel(channelName);
+    ch.sendToQueue(qName, Buffer.from(msg), options);
   }
 
   async consume(channelName, qName, callback, options = {}) {
@@ -328,17 +334,27 @@ exports.connect = function connect(conf, callback) {
  */
 exports.consume = function consume(channelName, qName, callback, options = {}) {
   zeroRabbit.consume(channelName, qName, callback, options);
-};
+}
 
 /**
  * @param {string} channelName - The name of the channel
  * @param {string} exName - The name of the exchange
- * @param {json} JsonMessage - A JSON compatible object, can be an JS Object
+ * @param {json} JsonMessage - A JSON compatible object, can be any JS Object
  * @param {string} routingKey - The routing key
  * @param {object} options - Options
  */
-exports.publish = function publish(channelName, exName, JsonMessage, routingKey = '', options = {}) {
-  zeroRabbit.publish(channelName, exName, JsonMessage, routingKey, options);
+exports.publish = function publish(channelName, exName, routingKey, JsonMessage, options = {}) {
+  zeroRabbit.publish(channelName, exName, routingKey, JsonMessage, options);
+}
+
+/**
+ * @param {string} channelName - The name of the channel
+ * @param {string} qName - The name of the queue
+ * @param {object} JsonMessage - A JSON compatible object, can be any JS Object
+ * @param {object} options - Options
+ */
+exports.sendToQueue = function sendToQueue(channelName, qName, JsonMessage, options = {}) {
+  zeroRabbit.sendToQueue(channelName, qName, JsonMessage, options);
 }
 
 /**
