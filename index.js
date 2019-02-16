@@ -24,15 +24,15 @@ class ZeroRabbit {
     this.consumerTags = new Map();
   }
   
-  connect(opts, callback) {
+  connect(conf, callback) {
     let connection;
-    if (opts.connection && opts.url) {
+    if (conf.connection && conf.url) {
       throw new Error('Config must include one of "connection" or "url", but not both!');
     }
-    if (opts.connection) {
-      connection = opts.connection;
-    } else if (opts.url) {
-      connection = opts.url
+    if (conf.connection) {
+      connection = conf.connection;
+    } else if (conf.url) {
+      connection = conf.url
     } else {
       throw new Error('"connection" or "url" not found in configuration: please include one!');
     }
@@ -45,18 +45,18 @@ class ZeroRabbit {
           throw new Error('Error creating connection: ' + err);
         }
       } else {
-        if (opts.connection) {
-          let protocol = opts.connection.protocol;
-          let hostname = opts.connection.hostname;
-          let port = opts.connection.port;
+        if (conf.connection) {
+          let protocol = conf.connection.protocol;
+          let hostname = conf.connection.hostname;
+          let port = conf.connection.port;
           debug('Connected to RabbitMQ: ' + protocol + '://' + hostname + ':' + port);
         } else {
-          debug('Connected to RabbitMQ: ' + opts.url)
+          debug('Connected to RabbitMQ: ' + conf.url)
         }
         
         this.rabbitConn = conn;
 
-        this.setupTopology(opts).then(() => {
+        this.setupTopology(conf).then(() => {
           debug('Channels opened: ' + this.channels.size);
       
           if (callback) {
@@ -74,22 +74,22 @@ class ZeroRabbit {
    * @param {Options} opts - An Options Object to be parsed for topology info
    *  
    */
-  async setupTopology(opts) {
+  async setupTopology(conf) {
 
-    if (opts.exchanges) {
-      await asyncForEach(opts.exchanges, async (exchange) => {
+    if (conf.exchanges) {
+      await asyncForEach(conf.exchanges, async (exchange) => {
         await this.assertExchange(exchange.channel, exchange.name, exchange.type, exchange.options);
       });
     } 
 
-    if (opts.queues) {
-      await asyncForEach(opts.queues, async (queue) => {
+    if (conf.queues) {
+      await asyncForEach(conf.queues, async (queue) => {
         await this.assertQueue(queue.channel, queue.name, queue.options);
       });
     } 
     
-    if (opts.bindings) {
-      await asyncForEach(opts.bindings, async (binding) => {
+    if (conf.bindings) {
+      await asyncForEach(conf.bindings, async (binding) => {
         await this.bindQueue(binding.channel, binding.queue, binding.exchange, binding.key, binding.options);
       });
     }  
@@ -251,7 +251,7 @@ class ZeroRabbit {
     this.checkChannelExists(ch);
     ch.ackAll();
   }
-
+ 
   nack(channelName, message, allUpTo = false, requeue = true) {
     let msg = message.getMsg();
     let ch = this.channels.get(channelName);
@@ -311,8 +311,13 @@ class ZeroRabbitMsg {
 
 const zeroRabbit = new ZeroRabbit();
 
-exports.connect = function connect(opts, callback) {
-  zeroRabbit.connect(opts, callback);
+
+/**
+ * @param {} conf
+ * @param {function} callback
+ */
+exports.connect = function connect(conf, callback) {
+  zeroRabbit.connect(conf, callback);
 }
 
 exports.consume = function consume(channelName = 'default', qName = 'default.q', options = {}, callback) {
@@ -324,11 +329,15 @@ exports.publish = function publish(channelName = 'default', exName = 'default.ex
   zeroRabbit.publish(channelName, exName, JsonMessage, routingKey, options);
 }
 
+
 exports.ack = function ack(channelName = 'default', message = new ZeroRabbitMsg(), allUpTo = false) {
   zeroRabbit.ack(channelName, message, allUpTo);
 }
 
-exports.ackAll = function ackAll(channelName = 'default') {
+/**
+ * @param {string} channelName
+ */
+exports.ackAll = function ackAll(channelName) {
   zeroRabbit.ackAll(channelName);
 }
 
