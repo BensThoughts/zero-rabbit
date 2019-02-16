@@ -16,7 +16,7 @@ rabbit.consume(channel, queue, function(message), options)
 ```javascript
 rabbit.publish(channel, exchange, routingKey, message, options)
 ```
-***routingKey*** is now not optional.  It is now the third arg and ***message*** is now the fourth. Again to be inline with the official amqplib which does not allow routingKey to be optional.  You must declare it as '' if you don't care about it.
+***routingKey*** is now not optional.  It is now the third arg and ***message*** is now the fourth. Again to be perfectly inline with the official amqplib which does not allow routingKey to be optional.  You must declare it as '' if you don't care about it.
 
 **New Functions:**
 ```javascript
@@ -246,7 +246,7 @@ For reference these are mostly wrappers to [https://www.squaremobius.net/amqp.no
 
 In all functions *channel* is a string.  It always the first argument. It is the name you have given or would like to give to the channel. See important notes at the top for information detailing how channels are created and destroyed.
 
-**connect**
+**Connect**
 ```javascript
 rabbit.connect(conf, function(err, conn))
 ```
@@ -258,11 +258,10 @@ rabbit.publish(channel, exchange, routingKey, message, options)
 
 *routingKey* is the routingKey
 
-*message* is any JSON compatible Object
+*message* is any JSON compatible Object. The message payload is expected to be a JSON compatible object. The internals of ZeroRabbit will stringify, turn into a Buffer, and then publish/send the message over the wire for you.
 
 *options* is optional
 
-The message payload is expected to be a JSON compatible object. The internals of ZeroRabbit will stringify, turn into a Buffer, and then publish/send the message over the wire for you.
 
 **Send to Queue**
 ```javascript
@@ -279,23 +278,27 @@ rabbit.sendToQueue(channel, queue, message, options)
 ```javascript
 rabbit.consume(channel, queue, function(message), options)
 ```
-*options* are optional
 
 *message* is a ZeroRabbitMsg (see above for explanation). The JSON decoded msg can be obtained with msg.content or msg.getJsonMsg(), the full rabbit msg can be obtained with msg.msg or msg.getMsg()
+
+*options* are optional
 
 
 **Set Channel Prefetch**
 ```javascript
 rabbit.setChannelPrefetch(channel, prefetch)
 ```
+*prefetch* is the number of messages to prefetch from a queue
+
 **Ack**
 ```javascript
 rabbit.ack(channel, message, allUpTo)
 ```
-*message* is a ZeroRabbitMsg (see above for explanation).
 
 *channel* is the name you gave the channel that the msg came from (i.e. the same channel that the message was delivered on). The channel that you ack the message on needs to be the same as the channel
 that the message was consumed from.
+
+*message* is a ZeroRabbitMsg (see above for explanation).
 
 *allUpTo* is a boolean that is optional and defaults to false. If allUpTo is true, all outstanding messages prior to and including the given message shall be considered acknowledged. If false, or omitted, only the message supplied is acknowledged.
 
@@ -305,6 +308,8 @@ It’s an error to supply a message that either doesn’t require acknowledgemen
 ```javascript
 rabbit.ackAll(channel)
 ```
+*channel* is the name you gave to the channel, read rabbit.ack() above for more info.
+
 Acknowledge all outstanding messages on the channel. This is a “safe” operation, in that it won’t result in an error even if there are no such messages.
 
 **Nack**
@@ -317,6 +322,8 @@ Be careful with nack, the default *requeue* is true and will cause your app to g
 nack is primarily to be used with dead letter exchanges, as in assertQueue dead letter exchange options [https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue](https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue). In general it is better to just ack bad messages. Advanced setups can use nack to deal with errors that are of a temporary nature, such as http connection errors.
 
 Reject a message. This instructs the server to either requeue the message or throw it away (which may result in it being dead-lettered).
+
+*channel* is the name you gave to the channel, read rabbit.ack() above for more info.
 
 *message* is a ZeroRabbitMsg (see above for explanation).
 
@@ -332,6 +339,8 @@ Be careful with nackAll() in the same way you need to be careful with nack(), bo
 
 Reject all messages outstanding on this channel.
 
+*channel* is the name you gave to the channel, read rabbit.ack() above for more info.
+
 *requeue* is an optional boolean that defaults to true. If requeue is truthy, or omitted, the server will try to re-enqueue the messages.
 
 
@@ -339,7 +348,7 @@ Reject all messages outstanding on this channel.
 ```javascript
 rabbit.assertExchange(channel, exchange, type, options, function(err, ex))
 ```
-function(err, ex) can be omitted as can options, but if you are asserting an exchange you probably want to make sure it has succeeded before proceeding.
+function(err, ex) can be omitted as can options, but if you are asserting an exchange you probably want to make sure it has succeeded before proceeding. Also if you include function(err, q) you need to also include options.
 
 **Assert Queue**
 ```javascript
@@ -351,29 +360,16 @@ function(err, q) can be omitted as can options, but if you are asserting a queue
 ```javascript
 rabbit.bindQueue(channel, queue, exchange, key, options, function(err, ok))
 ```
-function(err, ok) can be omitted as can options, but if you are binding a queue you probably want to make sure it has succeeded before proceeding.
+function(err, ok) can be omitted as can options, but if you are binding a queue you probably want to make sure it has succeeded before proceeding. Also if you include function(err, q) you need to also include options.
 
-*key* is optional and will default to ''
+*key* is optional and will default to ''. For basic use cases key === routingKey. More advance use cases key === pattern. Check official docs to understand what key is
 
-Best just to include all arguments and use '' for key and {} for options.
 
 **Delete Queue**
 ```javascript
 rabbit.deleteQueue(channel, queue, options, function(err, ok))
 ```
 *options* and *function(err, ok)* can be omitted
-
-**Get Channel**
-```javascript
-rabbit.getChannel(channel, function(err, ch))
-```
-*This will not be needed for most use cases.  It is provided for convenience, in case you want to do something over a channel that amqplib supports and Zero Rabbit does not yet do. Requests for additions to make Zero Rabbit handle some of the extra amqplib features are welcome*
-
-*channel* is the name of the channel (a string)
-
-*ch* is the actual channel object as found in amqplib (this will be a confirm channel), the same one that can be found here [https://www.squaremobius.net/amqp.node/channel_api.html#confirmchannel](https://www.squaremobius.net/amqp.node/channel_api.html#confirmchannel)
-
-*getChannel()* will retrieve the channel object from memory.  If the channel has not been created previously (via config or another rabbit function call) it will create a new channel, store it in memory, and then give you back the channel object.
 
 **Cancel Channel**
 ```javascript
@@ -389,6 +385,17 @@ This will close the channel. It will also delete the channel object from memory.
 
 I'm still trying to figure out cancel vs. close and right now in my own code I'm using cancelChannel() followed by closeChannel().
 
+**Get Channel**
+```javascript
+rabbit.getChannel(channel, function(err, ch))
+```
+*This will not be needed for most use cases.  It is provided for convenience, in case you want to do something over a channel that amqplib supports and Zero Rabbit does not yet do. Requests for additions to make Zero Rabbit handle some of the extra amqplib features are welcome*
+
+*channel* is the name of the channel
+
+*ch* is the actual channel object as found in amqplib (this will be a confirm channel), the same one that can be found here [https://www.squaremobius.net/amqp.node/channel_api.html#confirmchannel](https://www.squaremobius.net/amqp.node/channel_api.html#confirmchannel)
+
+*getChannel()* will retrieve the channel object from memory.  If the channel has not been created previously (via config or another rabbit function call) it will create a new channel, store it in memory, and then give you back the channel object.
 
 
 # Complicated examples:
