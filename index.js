@@ -247,48 +247,45 @@ class ZeroRabbit {
   // better already have been created if we are acking, right?
   ack(channelName, message, allUpTo = false) {
     let msg = message.getMsg();
-    let ch = this.channels.get(channelName);
-    this.checkChannelExists(ch);
+    let ch = this.getChannelFromMemory(channelName);
     ch.ack(msg, allUpTo);
   }
 
   ackAll(channelName) {
-    let ch = this.channels.get(channelName);
-    this.checkChannelExists(ch);
+    let ch = this.getChannelFromMemory(channelName);
     ch.ackAll();
   }
  
   nack(channelName, message, allUpTo = false, requeue = true) {
     let msg = message.getMsg();
-    let ch = this.channels.get(channelName);
-    this.checkChannelExists(ch);
+    let ch = this.getChannelFromMemory(channelName);
     ch.nack(msg, allUpTo, requeue)
   }
 
   nackAll(channelName, requeue = true) {
-    let ch = this.channels.get(channelName);
-    this.checkChannelExists(ch);
+    let ch = this.getChannelFromMemory(channelName);
     ch.nackAll(requeue);
   }
 
   closeChannel(channelName) {
-    let ch = this.channels.get(channelName);
-    this.checkChannelExists(ch);
+    let ch = this.getChannelFromMemory(channelName);
     ch.close();
     this.channels.delete(channelName);
-  } 
+  }
   
   cancelChannel(channelName) {
     let consumerTag = this.consumerTags.get(channelName);
-    let ch = this.channels.get(channelName);
-    this.checkChannelExists(ch);
+    // let ch = this.channels.get(channelName);
+    let ch = this.getChannelFromMemory(channelName);
     ch.cancel(consumerTag);
   }
 
-  checkChannelExists(ch) {
+  getChannelFromMemory(channelName) {
+    let ch = this.channels.get(channelName);
     if (ch === undefined) {
-      throw new Error('Channel was not found!, check your spelling, was the channel created?');
+      throw new Error('Channel "' + channelName + '" was not found!, check your spelling, was the channel created?');
     }
+    return ch;
   }
   
 }
