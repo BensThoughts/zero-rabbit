@@ -1,6 +1,6 @@
 # Zero Rabbit
 
-Zero Rabbit provides an abstraction over amqplib. It is fairly well developed however if you find any issues with it please open them up on the github page.  I am actively maintaining this and would like to make it as resilient as possible.
+Zero Rabbit is a RabbitMQ client library.  At it's core it provides a simple abstraction over amqplib. It is fairly well developed however if you find any issues with it please open them up on the github page.  I am actively maintaining this and would like to make it as resilient as possible.
 
 The feature that Zero Rabbit implements that I have not seen in any other RabbitMQ client library is the ability to control which channel you publish/consume on. This is very important for applications that need to listen to more than one queue at a time.
 
@@ -201,6 +201,11 @@ See below for more complicated examples.
 
 # Methods:
 
+For reference these are mostly wrappers to amqplib (https://www.squaremobius.net/amqp.node/channel_api.html). 
+
+
+In all functions *channel* is a string.  It always the first argument. It is the name you have given or would like to give to the channel. See important notes at the top for information detailing how channels are created and destroyed.
+
 **connect**
 
 rabbit.connect(conf, function(err, conn))
@@ -228,12 +233,38 @@ rabbit.setChannelPrefetch(*channel*, *prefetch*)
 
 **Ack**
 
-rabbit.ack(*channel*, *msg*)
+rabbit.ack(*channel*, *msg*, *allUpTo*)
 
 *msg* is a ZeroRabbitMsg (see above for explanation).
 
 *channel* is the name you gave the channel that the msg came from (i.e. the same channel that the message was delivered on). The channel that you ack the message on needs to be the same as the channel
 that the message was consumed from.
+
+*allUpTo* is a boolean that is optional. If allUpTo is true, all outstanding messages prior to and including the given message shall be considered acknowledged. If false, or omitted, only the message supplied is acknowledged.
+
+It’s an error to supply a message that either doesn’t require acknowledgement, or has already been acknowledged. Doing so will errorise the channel. If you want to acknowledge all the messages and you don’t have a specific message around, use #ackAll.
+
+**Ack All**
+
+rabbit.ackAll(*channel*)
+
+Acknowledge all outstanding messages on the channel. This is a “safe” operation, in that it won’t result in an error even if there are no such messages.
+
+**Nack**
+
+rabbit.nack(*channel*, *msg*, *allUpTo*, *requeue*)
+
+Reject a message. This instructs the server to either requeue the message or throw it away (which may result in it being dead-lettered).
+
+*allUpTo* is an optional boolean. If allUpTo is truthy, all outstanding messages prior to and including the given message are rejected. As with #ack, it’s a channel-ganking error to use a message that is not outstanding. Defaults to false.
+
+*requeue* is an optional boolean If requeue is truthy, the server will try to put the message or messages back on the queue or queues from which they came. Defaults to true if not given, so if you want to make sure messages are dead-lettered or discarded, supply false here.
+
+**Nack All**
+
+rabbit.nackAll(*channel*, *requeue*)
+
+Reject all messages outstanding on this channel. If requeue is truthy, or omitted, the server will try to re-enqueue the messages.
 
 
 **Assert Exchange**
@@ -266,7 +297,13 @@ rabbit.deleteQueue(*channel*, *queue*, *options*, *function(err, ok)*)
 
 rabbit.getChannel(*channel*, *function(err, ch)*)
 
-This will retrieve the channel object from memory.  If the channel has not been created previously it will create a new channel, store it in memory, and then give you back the channel object in the callback.  This will be the same channel object that amqplib gives so all possibilities are open with this. *This should not be needed unless you want to do something over a channel that Zero Rabbit currently does not do.*
+*This will not be needed for most use cases.  It is provided for convenience, in case you want to do something over a channel that amqplib supports and Zero Rabbit does not yet do. Requests for additions to make Zero Rabbit handle some of the extra amqplib features are welcome*
+
+*channel* is the name of the channel (a string)
+
+*ch* is the actual channel object as found in amqplib (this will be a confirm channel), the same one that can be found here (https://www.squaremobius.net/amqp.node/channel_api.html#confirmchannel)
+
+*getChannel()* will retrieve the channel object from memory.  If the channel has not been created previously (via config or another rabbit function call) it will create a new channel, store it in memory, and then give you back the channel object.
 
 **Cancel Channel**
 

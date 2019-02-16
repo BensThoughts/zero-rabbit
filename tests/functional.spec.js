@@ -1,4 +1,4 @@
-const rabbit = require('../index');
+const rabbit = require('zero-rabbit');
 
 
 let conf = {

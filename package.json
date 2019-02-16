@@ -18,8 +18,9 @@
   "author": "Benjamin Blumenfeld-Jones",
   "license": "ISC",
   "dependencies": {
-    "amqplib": "^0.5.3",
-    "debug": "^4.1.1"
+    "amqplib": "^0.5.3"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "debug": "^4.1.1"
+  }
 }
