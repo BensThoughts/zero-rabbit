@@ -372,7 +372,7 @@ exports.consume = function consume(channelName, qName, callback, options = {}) {
 /**
  * @param {string} channelName - The name of the channel
  * @param {string} exName - The name of the exchange
- * @param {json} JsonMessage - A JSON compatible object, can be any JS Object
+ * @param {object} JsonMessage - A JSON compatible object, can be any JS Object
  * @param {string} routingKey - The routing key
  * @param {object} options - Options
  */
