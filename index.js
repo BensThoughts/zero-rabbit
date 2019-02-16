@@ -474,7 +474,7 @@ exports.assertExchange = function assertExchange(channelName, exName, type, opti
  * @param {string} exName - The name of the exchange
  * @param {string} key - The routingKey
  * @param {Object} options - Options
- * @param {function} callback - (err, q) => {}
+ * @param {function} callback - (err, ok) => {}
  */
 exports.bindQueue = function bindQueue(channelName, qName, exName, key = '', options = {}, callback) {
   zeroRabbit.bindQueue(channelName, qName, exName, key, options, callback);

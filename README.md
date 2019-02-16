@@ -105,8 +105,6 @@ Technically a url string or connection object is the only required parameter of 
 
 ***Channels can be deleted*** (in other words closed/cancelled) with rabbit.closeChannel() and rabbit.cancelChannel() (see below).
 
-**IMPORTANT:** The first argument of ***ALL*** zero-rabbit functions (i.e. rabbit.consume() as below) is ***ALWAYS*** the channel on which to perform the specified action.  Again if the channel is not already created via the config object or via a function call, a new channel will be created.
-
 To avoid channels accumulating or unexpected behavior try to stick with using as few as you possibly can throughout your app and reuse the same channel where appropriate (i.e. use the same channel to publish on as you used to create the exchange and use the same channel to consume on as the one you used to create and bind a queue that it reads from).
 
 If your app only consumes from a single queue you can actually just use one channel for everything (publishing and consuming).
@@ -245,6 +243,8 @@ For reference these are mostly wrappers to [https://www.squaremobius.net/amqp.no
 
 
 In all functions *channel* is a string.  It is always the first argument. It is the name you have given or would like to give to the channel. See important notes at the top for information detailing how channels are created and destroyed.
+
+**IMPORTANT:** The first argument of ***ALL*** zero-rabbit functions (i.e. rabbit.consume() as below) is ***ALWAYS*** the channel on which to perform the specified action.  Again if the channel is not already created via the config object or via a function call, a new channel will be created.
 
 **Connect**
 ```javascript
