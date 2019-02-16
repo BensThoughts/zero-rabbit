@@ -53,15 +53,17 @@ The feature that Zero Rabbit implements that I have not seen in any other Rabbit
     }
 ```
 
-*options* and *key* are not optional as of right now, just use {} and '' respectively if you want
-to omit those things.
+*options* and *key* are now optional, but if you are experiencing any issues try including them as {} and '' respectively.
 
-Optionally you can include a url parameter instead of the connection parameter above, like so:
+Optionally you can include a url parameter instead of the connection object above, like so:
 ```javascript
     let conf = {
         url: 'amqp://localhost:5672'
     }
 ```
+Technically this is the only required param of the conf, either a url string or connection object.
+
+
 **Note:** You MUST declare a channel for all queues, exchanges, and bindings...This is actually a benefit as you will see (It allows you to consume off of multiple queues at the same time).
 
 **IMPORTANT:** channels are created idempotently and automatically within all function calls and config object declarations, with the *exception* of rabbit.ack(*...*), rabbit.ackAll(*...*), rabbit.nack(*...*), rabbit.nackAll(*...*), rabbit.closeChannel(*...*), and rabbit.cancelChannel(*...*).  This means that if you misspell a channel name somewhere later on in your code it will result in the creation of a new channel as well as possibly unexpected behavior.
