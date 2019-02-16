@@ -123,7 +123,7 @@ Within a ZeroRabbitMsg there exists two properties:
 **content**: A JSON deserialized version of the content portion of the message
 * The original message object can be obtained with msg.getJsonMsg() or msg.content.
 
-*So yes, Zero Rabbit is only really good for sending and receiving JSON messages as of right now.*
+*So yes, Zero Rabbit is really only good for sending and receiving JSON messages as of right now.*
 
 # Examples:
 
@@ -244,7 +244,7 @@ See below for more complicated examples.
 For reference these are mostly wrappers to [https://www.squaremobius.net/amqp.node/channel_api.html](https://www.squaremobius.net/amqp.node/channel_api.html). 
 
 
-In all functions *channel* is a string.  It always the first argument. It is the name you have given or would like to give to the channel. See important notes at the top for information detailing how channels are created and destroyed.
+In all functions *channel* is a string.  It is always the first argument. It is the name you have given or would like to give to the channel. See important notes at the top for information detailing how channels are created and destroyed.
 
 **Connect**
 ```javascript
