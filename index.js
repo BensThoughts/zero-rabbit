@@ -297,6 +297,7 @@ class ZeroRabbit {
   closeChannel(channelName) {
     let ch = this.getChannelFromMemory(channelName);
     ch.close();
+    this.consumerTags.delete(channelName);
     this.channels.delete(channelName);
   }
   
