@@ -242,9 +242,7 @@ See below for more complicated examples.
 For reference these are mostly wrappers to [https://www.squaremobius.net/amqp.node/channel_api.html](https://www.squaremobius.net/amqp.node/channel_api.html). 
 
 
-In all functions *channel* is a string.  It is always the first argument. It is the name you have given or would like to give to the channel. See important notes at the top for information detailing how channels are created and destroyed.
-
-**IMPORTANT:** The first argument of ***ALL*** zero-rabbit functions is ***ALWAYS*** the channel on which to perform the specified action.  Again if the channel is not already created via the config object or via a function call, a new channel will be created.
+**IMPORTANT:** The first argument of ***ALL*** zero-rabbit functions is ***ALWAYS*** the channel (a string) on which to perform the specified action.  Again if the channel is not already created via the config object or via a function call, a new channel will be created. See important notes at the top for information detailing how channels are created and destroyed.
 
 **Connect**
 ```javascript
