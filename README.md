@@ -201,7 +201,7 @@ See below for more complicated examples.
 
 # Methods:
 
-For reference these are mostly wrappers to amqplib (https://www.squaremobius.net/amqp.node/channel_api.html). 
+For reference these are mostly wrappers to [amqplib](https://www.squaremobius.net/amqp.node/channel_api.html). 
 
 
 In all functions *channel* is a string.  It always the first argument. It is the name you have given or would like to give to the channel. See important notes at the top for information detailing how channels are created and destroyed.
@@ -240,7 +240,7 @@ rabbit.ack(*channel*, *msg*, *allUpTo*)
 *channel* is the name you gave the channel that the msg came from (i.e. the same channel that the message was delivered on). The channel that you ack the message on needs to be the same as the channel
 that the message was consumed from.
 
-*allUpTo* is a boolean that is optional. If allUpTo is true, all outstanding messages prior to and including the given message shall be considered acknowledged. If false, or omitted, only the message supplied is acknowledged.
+*allUpTo* is a boolean that is optional and defaults to false. If allUpTo is true, all outstanding messages prior to and including the given message shall be considered acknowledged. If false, or omitted, only the message supplied is acknowledged.
 
 It’s an error to supply a message that either doesn’t require acknowledgement, or has already been acknowledged. Doing so will errorise the channel. If you want to acknowledge all the messages and you don’t have a specific message around, use #ackAll.
 
@@ -256,13 +256,13 @@ rabbit.nack(*channel*, *msg*, *allUpTo*, *requeue*)
 
 Be careful with nack, the default *requeue* is true and will cause your app to go into a loop if there is only one instance of it consuming from the queue, even if you do have multiple apps this may cause a nasty looping effect.
 
-nack is primarily to be used with dead letter exchanges, as in (https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue).  For basic use cases it is better to just ack bad messages or on errors and log the error somewhere.
+nack is primarily to be used with dead letter exchanges, as in [assertQueue dead letter exchange options](https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue). In general it is better to just ack bad messages. Advanced setups can use nack to deal with errors that are of a temporary nature, such as http connection errors.
 
 Reject a message. This instructs the server to either requeue the message or throw it away (which may result in it being dead-lettered).
 
-*allUpTo* is an optional boolean. If allUpTo is truthy, all outstanding messages prior to and including the given message are rejected. As with #ack, it’s a channel-ganking error to use a message that is not outstanding. Defaults to false.
+*allUpTo* is an optional boolean that defaults to false. If allUpTo is truthy, all outstanding messages prior to and including the given message are rejected. As with #ack, it’s a channel-ganking error to use a message that is not outstanding. Defaults to false.
 
-*requeue* is an optional boolean If requeue is truthy, the server will try to put the message or messages back on the queue or queues from which they came. Defaults to true if not given, so if you want to make sure messages are dead-lettered or discarded, supply false here.
+*requeue* is an optional boolean that defaults to true. If requeue is truthy, the server will try to put the message or messages back on the queue or queues from which they came. Defaults to true if not given, so if you want to make sure messages are dead-lettered or discarded, supply false here.
 
 **Nack All**
 
@@ -270,9 +270,9 @@ rabbit.nackAll(*channel*, *requeue*)
 
 Be careful with nackAll() in the same way you need to be careful with nack(), both are really for much more advanced use cases that most people will not have.
 
-Reject all messages outstanding on this channel. 
+Reject all messages outstanding on this channel.
 
-*requeue* is an optional boolean. If requeue is truthy, or omitted, the server will try to re-enqueue the messages.
+*requeue* is an optional boolean that defaults to true. If requeue is truthy, or omitted, the server will try to re-enqueue the messages.
 
 
 **Assert Exchange**
