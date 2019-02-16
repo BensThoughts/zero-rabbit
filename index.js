@@ -96,7 +96,7 @@ class ZeroRabbit {
   
   }
 
-  async assertExchange(channelName, exName, type, options, callback) {
+  async assertExchange(channelName, exName, type, options = {}, callback) {
     let ch = await this.getChannel(channelName);
     ch.assertExchange(exName, type, options, (err, ex) => {
       if (callback) {
@@ -109,7 +109,7 @@ class ZeroRabbit {
     });
   }
 
-  async assertQueue(channelName, qName, options, callback) {
+  async assertQueue(channelName, qName, options = {}, callback) {
     let ch = await this.getChannel(channelName);
     ch.assertQueue(qName, options, (err, q) => {
       if (callback) {
@@ -122,7 +122,7 @@ class ZeroRabbit {
     });
   }
 
-  async bindQueue(channelName, qName, exName, key, options, callback) {
+  async bindQueue(channelName, qName, exName, key = '', options = {}, callback) {
     let ch = await this.getChannel(channelName);
     ch.bindQueue(qName, exName, key, options, (err, ok) => {
       if (callback) {
@@ -136,7 +136,7 @@ class ZeroRabbit {
     });
   }
 
-  async deleteQueue(channelName, qName, options, callback) {
+  async deleteQueue(channelName, qName, options = {}, callback) {
     let ch = await this.getChannel(channelName);
     ch.deleteQueue(qName, options, (err, ok) => {
       if (callback) {
@@ -214,13 +214,13 @@ class ZeroRabbit {
     ch.prefetch(prefetch);
   }
 
-  async publish(channelName, exName, JsonMessage, routingKey, options) {
+  async publish(channelName, exName, JsonMessage, routingKey = '', options = {}) {
     let msg = JSON.stringify(JsonMessage);
     let ch = await this.getChannel(channelName);
-    ch.publish(exName, routingKey || '', Buffer.from(msg), options || {});
+    ch.publish(exName, routingKey, Buffer.from(msg), options);
   }
 
-  async consume(channelName, qName, callback, options) {
+  async consume(channelName, qName, callback, options = {}) {
     let ch = await this.getChannel(channelName);
     let optionsMsg = util.inspect(options);
     debug('Listenting on channel ' + channelName + ' to: ' + qName + ' with options: ' + optionsMsg);
@@ -313,8 +313,8 @@ const zeroRabbit = new ZeroRabbit();
 
 
 /**
- * @param {} conf
- * @param {function} callback
+ * @param {} conf - ZeroRabbit Conf
+ * @param {function} callback - (err, conn) => {}
  */
 exports.connect = function connect(conf, callback) {
   zeroRabbit.connect(conf, callback);
@@ -330,59 +330,120 @@ exports.consume = function consume(channelName, qName, callback, options = {}) {
   zeroRabbit.consume(channelName, qName, callback, options);
 };
 
-
-exports.publish = function publish(channelName = 'default', exName = 'default.ex', JsonMessage = {}, routingKey = '', options = {}) {
+/**
+ * @param {string} channelName - The name of the channel
+ * @param {string} exName - The name of the exchange
+ * @param {json} JsonMessage - A JSON compatible object, can be an JS Object
+ * @param {string} routingKey - The routing key
+ * @param {object} options - Options
+ */
+exports.publish = function publish(channelName, exName, JsonMessage, routingKey = '', options = {}) {
   zeroRabbit.publish(channelName, exName, JsonMessage, routingKey, options);
 }
 
-
-exports.ack = function ack(channelName = 'default', message = new ZeroRabbitMsg(), allUpTo = false) {
+/**
+ * @param {string} channelName - The name of the channel
+ * @param {ZeroRabbitMsg} message - A ZeroRabbitMsg
+ * @param {boolean} allUpTo - Ack every message up to and including this one
+ */
+exports.ack = function ack(channelName, message, allUpTo = false) {
   zeroRabbit.ack(channelName, message, allUpTo);
 }
 
 /**
- * @param {string} channelName
+ * @param {string} channelName - The name of the channel
  */
 exports.ackAll = function ackAll(channelName) {
   zeroRabbit.ackAll(channelName);
 }
 
-exports.nack = function nack(channelName = 'default', message = new ZeroRabbitMsg(), allUpTo = false, requeue = true) {
+/**
+ * @param {string} channelName - The name of the channel
+ * @param {ZeroRabbitMsg} message - A ZeroRabbitMsg
+ * @param {boolean} allUpTo - Nack every message up to and including this one
+ * @param {boolean} requeue - Requeue the message after nack
+ */
+exports.nack = function nack(channelName, message, allUpTo = false, requeue = true) {
   zeroRabbit.nack(channelName, message, allUpTo, requeue)
 }
 
-exports.nackAll = function nackAll(channelName = 'default', requeue = true) {
+/**
+ * @param {string} channelName - The name of the channel
+ * @param {boolean} requeue - Requeue all messages after nack
+ */
+exports.nackAll = function nackAll(channelName, requeue = true) {
   zeroRabbit.nackAll(channelName, requeue);
 }
 
-exports.setChannelPrefetch = function setChannelPrefetch(channelName = 'default', prefetch = 1) {
+/**
+ * @param {string} channelName - The name of the channel
+ * @param {number} prefetch - The number of messages to prefetch
+ */
+exports.setChannelPrefetch = function setChannelPrefetch(channelName, prefetch) {
   zeroRabbit.setChannelPrefetch(channelName, prefetch);
 }
 
-exports.assertQueue = function assertQueue(channelName = 'default', qName = 'default.q', options = {}, callback) {
+/**
+ * @param {string} channelName - The name of the channel
+ * @param {string} qName - The name of the queue
+ * @param {Object} options - Options
+ * @param {function} callback - (err, q) => {}
+ */
+exports.assertQueue = function assertQueue(channelName, qName, options = {}, callback) {
   zeroRabbit.assertQueue(channelName, qName, options, callback);
 }
 
-exports.deleteQueue = function deleteQueue(channelName = 'default', qName = 'default.q', options = {}, callback) {
+/**
+ * @param {string} channelName - The name of the channel
+ * @param {string} qName - The name of the queue
+ * @param {Object} options - Options
+ * @param {function} callback - (err, ok) => {}
+ */
+exports.deleteQueue = function deleteQueue(channelName, qName, options = {}, callback) {
   zeroRabbit.deleteQueue(channelName, qName, options, callback);
 }
 
-exports.assertExchange = function assertExchange(channelName = 'default', exName = 'default.ex', type = 'fanout', options = {}, callback) {
+/**
+ * @param {string} channelName - The name of the channel
+ * @param {string} exName - The name of the exchange
+ * @param {string} type - The type of exchange ('direct', 'fanout', 'topic', etc.)
+ * @param {Object} options - Options
+ * @param {function} callback - (err, ex) => {}
+ */
+exports.assertExchange = function assertExchange(channelName, exName, type, options = {}, callback) {
   zeroRabbit.assertExchange(channelName, exName, type, options, callback)
 }
 
-exports.bindQueue = function bindQueue(channelName = 'default', qName = 'default.q', exName = 'default.ex', key = '', options = {}, callback) {
+/**
+ * @param {string} channelName - The name of the channel
+ * @param {string} qName - The name of the queue
+ * @param {string} exName - The name of the exchange
+ * @param {string} key - The routingKey
+ * @param {Object} options - Options
+ * @param {function} callback - (err, q) => {}
+ */
+exports.bindQueue = function bindQueue(channelName, qName, exName, key = '', options = {}, callback) {
   zeroRabbit.bindQueue(channelName, qName, exName, key, options, callback);
 }
 
-exports.closeChannel = function closeChannel(channelName = 'default') {
+/**
+ * @param {string} channelName - The name of the channel
+ */
+exports.closeChannel = function closeChannel(channelName) {
   zeroRabbit.closeChannel(channelName);
 }
 
-exports.cancelChannel = function cancelChannel(channelName = 'default') {
+/**
+ * @param {string} channelName - The name of the channel
+ */
+exports.cancelChannel = function cancelChannel(channelName) {
   zeroRabbit.cancelChannel(channelName);
 }
 
-exports.getChannel = function getChannel(channelName = 'default', callback) {
+/**
+ * @param {string} channelName - The name of the channel
+ * @param {function} callback - (err, ch) => {}
+ */
+exports.getChannel = function getChannel(channelName, callback) {
   zeroRabbit.getChannel(channelName, callback);
 }
