@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "zero-rabbit": "^0.1.12"
+    "zero-rabbit": "file:.."
   }
 }
