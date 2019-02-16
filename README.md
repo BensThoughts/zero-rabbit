@@ -4,13 +4,13 @@ Zero Rabbit is a RabbitMQ client library.  At it's core it provides a simple abs
 
 The feature that Zero Rabbit implements that I have not seen in any other RabbitMQ client library is the ability to control which channel you publish/consume on. This is very important for applications that need to listen to more than one queue at a time.
 
-# Official 1.0.3 release:
+# Official 1.0.4 release:
 
 **Consume is now:** 
 ```javascript
 rabbit.consume(channel, queue, function(message), options)
 ```
-***options*** has been moved to the last argument so that it is now optional. This also means that all methods have the identical order to the official amqplib method calls.
+***options*** has been moved to the last argument so that it is now optional. This also means that all methods have the identical order to the official amqplib method calls. This will now be forever and always.
 
 **Publish is now:**
 ```javascript
@@ -166,7 +166,7 @@ Within a ZeroRabbitMsg there exists two properties:
 
     rabbit.connect(conf, (err, conn) => {
       
-      rabbit.publish('myapp.send.1', 'myapp.ex.1', message, '', {
+      rabbit.publish('myapp.send.1', 'myapp.ex.1', '', message, {
         contentType: 'application/json', 
         type: 'some-data',
         appId: 'my-app',
@@ -532,7 +532,7 @@ rabbit.getChannel(channel, function(err, ch))
             some_data: transformed_data
         }
 
-        rabbit.publish('myapp.send.1', 'myapp.ex.1', transformed_message);
+        rabbit.publish('myapp.send.1', 'myapp.ex.1', '', transformed_message);
 
       }, { noAck: true });
 
