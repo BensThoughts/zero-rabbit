@@ -146,18 +146,3 @@ describe('Zero Rabbit: ', () => {
         });
     })
 });
-
-
-/* rabbit.connect(conf, (err, conn) => {
-    let message = {
-        test: 'test23'
-    }
-    rabbit.publish('test.send.1', 'test.ex.1', '', message, {});
-
-    rabbit.consume('test.listen.1', 'test.q.1', (msg) => {
-        console.log(msg);
-        rabbit.ack('test.listen.1', msg, false);
-    }, { noAck: false });
-    
-
-}) */
