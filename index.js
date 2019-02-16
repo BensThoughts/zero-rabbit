@@ -78,60 +78,87 @@ class ZeroRabbit {
 
     if (conf.exchanges) {
       await asyncForEach(conf.exchanges, async (exchange) => {
-        await this.assertExchange(exchange.channel, exchange.name, exchange.type, exchange.options);
+        await this.assertExchangePromise(exchange.channel, exchange.name, exchange.type, exchange.options);
       });
     } 
 
     if (conf.queues) {
       await asyncForEach(conf.queues, async (queue) => {
-        await this.assertQueue(queue.channel, queue.name, queue.options);
+        await this.assertQueuePromise(queue.channel, queue.name, queue.options);
       });
     } 
     
     if (conf.bindings) {
       await asyncForEach(conf.bindings, async (binding) => {
-        await this.bindQueue(binding.channel, binding.queue, binding.exchange, binding.key, binding.options);
+        await this.bindQueuePromise(binding.channel, binding.queue, binding.exchange, binding.key, binding.options);  
       });
     }  
   
   }
 
+  assertExchangePromise(channelName, exName, type, options = {}) {
+    return new Promise((resolve, reject) => {
+      this.assertExchange(channelName, exName, type, options, (err, ex) => {
+        if (err) reject(err);
+        else resolve(ex);
+      })
+    });
+  }
+
   async assertExchange(channelName, exName, type, options = {}, callback) {
     let ch = await this.getChannel(channelName);
     ch.assertExchange(exName, type, options, (err, ex) => {
+      let exInfo = util.inspect(ex);
+      debug('assertExchange on channel ' + channelName + ': ' + exInfo);
       if (callback) {
         callback(err,ex)
       } else {
         if (err) throw new Error('Error in assertExchange(): ' + err);
-        let exInfo = util.inspect(ex);
-        debug('assertExchange on channel ' + channelName + ': ' + exInfo);
       }
+    });
+  }
+
+  assertQueuePromise(channelName, qName, options = {}) {
+    return new Promise((resolve, reject) => {
+      this.assertQueue(channelName, qName, options, (err, q) => {
+        if (err) reject(err);
+        else resolve(q);
+      })
     });
   }
 
   async assertQueue(channelName, qName, options = {}, callback) {
     let ch = await this.getChannel(channelName);
     ch.assertQueue(qName, options, (err, q) => {
+      let qInfo = util.inspect(q);
+      debug('assertQueue on channel ' + channelName + ': ' + qInfo);
       if (callback) {
         callback(err, q);
       } else {
         if (err) throw new Error('Error in ZeroRabbit.assertQueue(): ' + err);
-        let qInfo = util.inspect(q);
-        debug('assertQueue on channel ' + channelName + ': ' + qInfo);
       }
     });
+  }
+
+  bindQueuePromise(channelName, qName, exName, key = '', options = {}) {
+    return new Promise((resolve, reject) => {
+      this.bindQueue(channelName, qName, exName, key, options, (err, ok) => {
+        if (err) reject(err);
+        else resolve(ok);
+      })
+    })
   }
 
   async bindQueue(channelName, qName, exName, key = '', options = {}, callback) {
     let ch = await this.getChannel(channelName);
     ch.bindQueue(qName, exName, key, options, (err, ok) => {
+      debug('Bind queue: ' + qName + ' to ' + exName + ' on channel ' + channelName);
+      debug('Bound ' + qName + ' with key: ' + key);
+      debug('Bound ' + qName + ' with options: ' + options)
       if (callback) {
         callback(err, ok);
       } else {
         if (err) throw new Error('Error in RabbitMQ.bindQueue(): ' + err);
-        debug('Bind queue: ' + qName + ' to ' + exName + ' on channel ' + channelName);
-        debug('Bound ' + qName + ' with key: ' + key);
-        debug('Bound ' + qName + ' with options: ' + options)
       }
     });
   }
@@ -204,7 +231,7 @@ class ZeroRabbit {
     } else if(callback) {
       callback(undefined, ch);
     } else {
-      debug('Retrieved confirm channel from this.channels');
+      debug('Retrieved confirm channel: ' +  channelName);
       return ch;
     }
   }
@@ -287,6 +314,12 @@ class ZeroRabbit {
     }
     return ch;
   }
+
+  disconnect(callback) {
+    this.rabbitConn.close((err) => {
+      callback(err);
+    })
+  }
   
 }
 
@@ -312,7 +345,7 @@ class ZeroRabbitMsg {
   }
 }
 
-const zeroRabbit = new ZeroRabbit();
+let zeroRabbit = new ZeroRabbit();
 
 
 /**
@@ -465,4 +498,9 @@ exports.cancelChannel = function cancelChannel(channelName) {
  */
 exports.getChannel = function getChannel(channelName, callback) {
   zeroRabbit.getChannel(channelName, callback);
+}
+
+exports.disconnect = function disconnect(callback) {
+  zeroRabbit.disconnect(callback);
+  zeroRabbit = new ZeroRabbit();
 }
