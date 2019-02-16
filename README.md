@@ -1,6 +1,7 @@
 # Zero Rabbit
 
 Official 1.0.0 release:
+    
     rabbit.consume() is now rabbit.consume(*channel*, *queue*, *function(message)*, *options*)
 
     *options* has been moved to the last argument so that it is now optional. This also means that all methods have the identical order to the official amqplib method calls.
