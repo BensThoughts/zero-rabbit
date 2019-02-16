@@ -78,7 +78,7 @@ let confWithoutOptions = {
         {
             channel: "test.send.1",
             queue: "test.without.options.q.1",
-            exchange: "test.ex.1",
+            exchange: "test.without.options.ex.1",
         }
     ]
 }
@@ -127,9 +127,6 @@ describe('Zero Rabbit: ', () => {
                 done();
             });
         });
-
-
-
     });
     describe('Function Connection Error Tests: ', () => {
         it('should throw an error if both url and connection object are used', () => {
@@ -144,5 +141,24 @@ describe('Zero Rabbit: ', () => {
             }
             expect(badConnect).to.throw(Error);
         });
-    })
+    });
+    describe('Publishing: ', () => {
+        afterEach(() => {
+            rabbit.disconnect((err) => {
+                if (err) console.log(err);
+            });
+        });
+        it('should publish to a queue without options', (done) => {
+            rabbit.connect(confWithoutOptions, (err, conn) => {
+                let message = {
+                    'userId': 'userId',
+                    'token': 'token',
+                    'some_data': ['data1', 'data2', 'data3']
+                }
+                rabbit.publish('test.send.1', 'test.without.options.ex.1', '', message);
+                done();
+            });
+        });
+    });
+
 });
