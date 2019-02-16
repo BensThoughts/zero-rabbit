@@ -17,20 +17,20 @@ let conf = {
             channel: "test.send.1",
             name: "test.ex.1",
             type: "fanout",
-            options: { "autoDelete": true }
+            // options: { "autoDelete": true }
         },
         {
             channel: "test.send.2",
             name: "test.ex.2",
             type: "topic",
-            options: { "autoDelete": true }
+            // options: { "autoDelete": true }
         }
     ],
     queues: [
         {
             channel: "test.listen.1",
             name: "test.q.1",
-            options: { "autoDelete": true, "durable": false }
+            // options: { "autoDelete": true, "durable": false }
         }
     ],
     bindings: [
@@ -38,8 +38,8 @@ let conf = {
             channel: "test.send.1",
             queue: "test.q.1",
             exchange: "test.ex.1",
-            key: "",
-            options: {}
+            // key: "",
+            // options: {}
         }
     ]
 }
@@ -56,5 +56,6 @@ rabbit.connect(conf, (err, conn) => {
     rabbit.consume('test.listen.1', 'test.q.1', { noAck: false }, (msg) => {
         console.log(msg);
         rabbit.ack('test.listen.1', msg, false);
-    })
+    });
+
 })

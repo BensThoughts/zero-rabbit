@@ -1,5 +1,10 @@
 # Zero Rabbit
 
+Official 1.0.0 release:
+    rabbit.consume() is now rabbit.consume(*channel*, *queue*, *function(message)*, *options*)
+
+    *options* has been moved to the last argument so that it is now optional. This also means that all methods have the identical order to the official amqplib method calls.
+
 Zero Rabbit is a RabbitMQ client library.  At it's core it provides a simple abstraction over amqplib. It is fairly well developed however if you find any issues with it please open them up on the github page.  I am actively maintaining this and would like to make it as resilient as possible.
 
 The feature that Zero Rabbit implements that I have not seen in any other RabbitMQ client library is the ability to control which channel you publish/consume on. This is very important for applications that need to listen to more than one queue at a time.
@@ -190,7 +195,7 @@ The msg payload that rabbit.publish(*channel*, *exchange*, *msg*, ...) expects i
     rabbit.connect(conf, (err, conn) => {
       rabbit.setChannelPrefetch('myapp.listen.1', 1);
       
-      rabbit.consume('myapp.listen.1', 'myapp.q.1', { noAck: false }, (msg) => {
+      rabbit.consume('myapp.listen.1', 'myapp.q.1', (msg) => {
         let userId = msg.content.userId;
         let access_token = msg.content.access_token;
         let some_data = msg.content.some_data;
@@ -198,7 +203,8 @@ The msg payload that rabbit.publish(*channel*, *exchange*, *msg*, ...) expects i
         rabbit.ack('myapp.listen.1', msg);
         
         do_something_with_some_data(userId, access_token, some_data);
-      });
+      
+      }, { noAck: false });
 
     });
 ```
@@ -226,9 +232,9 @@ The message payload is expected to be a JSON object. The internals of ZeroRabbit
 
 **Consume**
 ```javascript
-rabbit.consume(channel, queue, options, function(message))
+rabbit.consume(channel, queue, function(message), options)
 ```
-*options* are not optional as of right now, just use {} if you do not want to use any options.
+*options* are optional
 
 *message* is a ZeroRabbitMsg (see above for explanation). The JSON decoded msg can be obtained with msg.content or msg.getJsonMsg(), the full rabbit msg can be obtained with msg.msg or msg.getMsg()
 
@@ -294,13 +300,15 @@ function(err, ex) can be omitted as can options, but if you are asserting an exc
 ```javascript
 rabbit.assertQueue(channel, queue, options, function(err, q))
 ```
-function(err, q) can be omitted as can options, but if you are asserting a queue you probably want to make sure it has succeeded before proceeding.
+function(err, q) can be omitted as can options, but if you are asserting a queue you probably want to make sure it has succeeded before proceeding. Also if you include function(err, q) you need to also include options.
 
 **Bind Queue**
 ```javascript
 rabbit.bindQueue(channel, queue, exchange, key, options, function(err, ok))
 ```
-function(err, ok) can be omitted as can options, but if you are binding a queue you probably want to make sure it has succeeded before proceeding.  key must be included but can be set to '' if you don't need it.
+function(err, ok) can be omitted as can options, but if you are binding a queue you probably want to make sure it has succeeded before proceeding.
+
+*key* is optional and will default to ''
 
 Best just to include all arguments and use '' for key and {} for options.
 
@@ -396,20 +404,20 @@ I'm still trying to figure out cancel vs. close and right now in my own code I'm
     rabbit.connect(conf, (err, conn) => {
 
       rabbit.setChannelPrefetch('myapp.listen.1', 1);
-      rabbit.consume('myapp.listen.1', 'myapp.q.1', { noAck: false }, (msg) => {
+      rabbit.consume('myapp.listen.1', 'myapp.q.1', (msg) => {
         let JsonContent = msg.content;
         rabbit.ack('myapp.listen.1', msg);
         
         console.log(JsonContent);
-      });
+      }, { noAck: false });
 
       rabbit.setChannelPrefetch('myapp.listen.2', 1);
-      rabbit.consume('myapp.listen.2', 'myapp.q.2', { noAck: false }, (msg2) => {
+      rabbit.consume('myapp.listen.2', 'myapp.q.2', (msg2) => {
         let JsonContent2 = msg2.getJsonMsg();
         rabbit.ack('batch.listen.2', msg2);
         
         console.log(JsonContent2);
-      });
+      }, { noAck: false });
 
     });
 ```
@@ -456,9 +464,10 @@ I'm still trying to figure out cancel vs. close and right now in my own code I'm
     }
 
     rabbit.connect(conf, (err, conn) => {
+
       rabbit.setChannelPrefetch('myapp.listen.1', 1);
       
-      rabbit.consume('myapp.listen.1', 'myapp.q.1', { noAck: true }, (msg) => {
+      rabbit.consume('myapp.listen.1', 'myapp.q.1', (msg) => {
         let userId = msg.content.userId;
         let access_token = msg.content.access_token;
         let some_data = msg.content.some_data;
@@ -472,7 +481,8 @@ I'm still trying to figure out cancel vs. close and right now in my own code I'm
         }
 
         rabbit.publish('myapp.send.1', 'myapp.ex.1', transformed_message);
-      });
+
+      }, { noAck: true });
 
     });
 ```

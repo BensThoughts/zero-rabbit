@@ -441,6 +441,12 @@ exports.cancelChannel = function cancelChannel(channelName) {
 }
 
 /**
+ * getChannel() will attempt to get the channel from memory. If
+ * the channel has not been created via a conf object or function
+ * call (such as rabbit.assertQueue()) it will be created when you 
+ * attempt to get it. see https://www.npmjs.com/package/zero-rabbit
+ * for more details.
+ * 
  * @param {string} channelName - The name of the channel
  * @param {function} callback - (err, ch) => {}
  */
