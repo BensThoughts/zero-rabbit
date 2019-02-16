@@ -242,7 +242,7 @@ See below for more complicated examples.
 For reference these are mostly wrappers to [https://www.squaremobius.net/amqp.node/channel_api.html](https://www.squaremobius.net/amqp.node/channel_api.html). 
 
 
-**IMPORTANT:** The first argument of ***ALL*** zero-rabbit functions is ***ALWAYS*** the channel name (a string) on which to perform the specified action.  Again if the channel is not already created via the config object or via a function call, a new channel will be created. See important notes at the top for information detailing how channels are created and destroyed.
+**IMPORTANT:** The first argument of ***ALL*** zero-rabbit functions (*with the exception of rabbit.connect(*...*)*) is ***ALWAYS*** the channel name (a string) on which to perform the specified action.  Again if the channel is not already created via the config object or via a function call, a new channel will be created. See important notes at the top for information detailing how channels are created and destroyed.
 
 **Connect**
 ```javascript
