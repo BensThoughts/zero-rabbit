@@ -6,6 +6,7 @@ The feature that Zero Rabbit implements that I have not seen in any other Rabbit
 
 # Config
 
+```javascript
     const conf = {
 
         connection: {
@@ -50,6 +51,7 @@ The feature that Zero Rabbit implements that I have not seen in any other Rabbit
             }
         ]
     }
+```
 
 *options* and *key* are not optional as of right now, just use {} and '' respectively if you want
 to omit those things.
@@ -235,9 +237,9 @@ rabbit.setChannelPrefetch(channel, prefetch)
 ```
 **Ack**
 ```javascript
-rabbit.ack(channel, msg, allUpTo)
+rabbit.ack(channel, message, allUpTo)
 ```
-*msg* is a ZeroRabbitMsg (see above for explanation).
+*message* is a ZeroRabbitMsg (see above for explanation).
 
 *channel* is the name you gave the channel that the msg came from (i.e. the same channel that the message was delivered on). The channel that you ack the message on needs to be the same as the channel
 that the message was consumed from.
@@ -254,13 +256,16 @@ Acknowledge all outstanding messages on the channel. This is a “safe” operat
 
 **Nack**
 ```javascript
-rabbit.nack(channel, msg, allUpTo, requeue)
+rabbit.nack(channel, message, allUpTo, requeue)
 ```
+
 Be careful with nack, the default *requeue* is true and will cause your app to go into a loop if there is only one instance of it consuming from the queue, even if you do have multiple apps this may cause a nasty looping effect.
 
 nack is primarily to be used with dead letter exchanges, as in assertQueue dead letter exchange options [https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue](https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue). In general it is better to just ack bad messages. Advanced setups can use nack to deal with errors that are of a temporary nature, such as http connection errors.
 
 Reject a message. This instructs the server to either requeue the message or throw it away (which may result in it being dead-lettered).
+
+*message* is a ZeroRabbitMsg (see above for explanation).
 
 *allUpTo* is an optional boolean that defaults to false. If allUpTo is truthy, all outstanding messages prior to and including the given message are rejected. As with #ack, it’s a channel-ganking error to use a message that is not outstanding. Defaults to false.
 
