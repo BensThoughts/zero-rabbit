@@ -1,4 +1,4 @@
-const rabbit = require('zero-rabbit');
+const rabbit = require('../index');
 
 
 let conf = {
@@ -17,20 +17,20 @@ let conf = {
             channel: "test.send.1",
             name: "test.ex.1",
             type: "fanout",
-            options: {}
+            options: { "autoDelete": true }
         },
         {
             channel: "test.send.2",
             name: "test.ex.2",
             type: "topic",
-            options: {}
+            options: { "autoDelete": true }
         }
     ],
     queues: [
         {
             channel: "test.listen.1",
             name: "test.q.1",
-            options: { "autoDelete": false }
+            options: { "autoDelete": true, "durable": false }
         }
     ],
     bindings: [
@@ -48,11 +48,13 @@ let conf = {
 
 
 rabbit.connect(conf, (err, conn) => {
-    rabbit.getChannel('threads.listen.3', (err, ch) => {
-        let message = {
-            test: 'test23'
-        }
-        message = JSON.stringify(message);
-        ch.publish('test.ex.1', '', Buffer.from(message))
-    });
+    let message = {
+        test: 'test23'
+    }
+    rabbit.publish('test.send.1', 'test.ex.1', message, '', {});
+
+    rabbit.consume('test.listen.1', 'test.q.1', { noAck: false }, (msg) => {
+        console.log(msg);
+        rabbit.ack('test.listen.1', msg, false);
+    })
 })

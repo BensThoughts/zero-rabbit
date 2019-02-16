@@ -254,6 +254,10 @@ Acknowledge all outstanding messages on the channel. This is a “safe” operat
 
 rabbit.nack(*channel*, *msg*, *allUpTo*, *requeue*)
 
+Be careful with nack, the default *requeue* is true and will cause your app to go into a loop if there is only one instance of it consuming from the queue, even if you do have multiple apps this may cause a nasty looping effect.
+
+nack is primarily to be used with dead letter exchanges, as in (https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue).  For basic use cases it is better to just ack bad messages or on errors and log the error somewhere.
+
 Reject a message. This instructs the server to either requeue the message or throw it away (which may result in it being dead-lettered).
 
 *allUpTo* is an optional boolean. If allUpTo is truthy, all outstanding messages prior to and including the given message are rejected. As with #ack, it’s a channel-ganking error to use a message that is not outstanding. Defaults to false.
@@ -264,7 +268,11 @@ Reject a message. This instructs the server to either requeue the message or thr
 
 rabbit.nackAll(*channel*, *requeue*)
 
-Reject all messages outstanding on this channel. If requeue is truthy, or omitted, the server will try to re-enqueue the messages.
+Be careful with nackAll() in the same way you need to be careful with nack(), both are really for much more advanced use cases that most people will not have.
+
+Reject all messages outstanding on this channel. 
+
+*requeue* is an optional boolean. If requeue is truthy, or omitted, the server will try to re-enqueue the messages.
 
 
 **Assert Exchange**

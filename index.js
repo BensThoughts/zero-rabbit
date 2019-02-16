@@ -239,14 +239,35 @@ class ZeroRabbit {
 
   // when ack we Don't getChannel() (which is imdepotent) because the channel had
   // better already have been created if we are acking, right?
-  ack(channelName, msg) {
+  ack(channelName, msg, allUpTo = false) {
     let message = msg.getMsg();
-    let ch = this.channels.get(channelName)
-    ch.ack(message);
+    let ch = this.channels.get(channelName);
+    this.checkChannelExists(ch);
+    ch.ack(message, allUpTo);
+  }
+
+  ackAll(channelName) {
+    let ch = this.channels.get(channelName);
+    this.checkChannelExists(ch);
+    ch.ackAll();
+  }
+
+  nack(channelName, msg, allUpTo = false, requeue = true) {
+    let message = msg.getMsg();
+    let ch = this.channels.get(channelName);
+    this.checkChannelExists(ch);
+    ch.nack(message, allUpTo, requeue)
+  }
+
+  nackAll(channelName, requeue = true) {
+    let ch = this.channels.get(channelName);
+    this.checkChannelExists(ch);
+    ch.nackAll(requeue);
   }
 
   closeChannel(channelName) {
     let ch = this.channels.get(channelName);
+    this.checkChannelExists(ch);
     ch.close();
     this.channels.delete(channelName);
   } 
@@ -254,7 +275,14 @@ class ZeroRabbit {
   cancelChannel(channelName) {
     let consumerTag = this.consumerTags.get(channelName);
     let ch = this.channels.get(channelName);
+    this.checkChannelExists(ch);
     ch.cancel(consumerTag);
+  }
+
+  checkChannelExists(ch) {
+    if (ch === undefined) {
+      throw new Error('Channel was not found!, check your spelling, was the channel created?');
+    }
   }
   
 }
@@ -296,8 +324,20 @@ exports.publish = function publish(channelName, exName, msg, routingKey, options
   zeroRabbit.publish(channelName, exName, msg, routingKey, options);
 }
 
-exports.ack = function ack(channelName, msg) {
-  zeroRabbit.ack(channelName, msg);
+exports.ack = function ack(channelName, msg, allUpTo) {
+  zeroRabbit.ack(channelName, msg, allUpTo);
+}
+
+exports.ackAll = function ackAll(channelName) {
+  zeroRabbit.ackAll(channelName);
+}
+
+exports.nack = function nack(channelName, msg, allUpTo, requeue) {
+  zeroRabbit.nack(channelName, msg, allUpTo, requeue)
+}
+
+exports.nackAll = function nackAll(channelName, requeue) {
+  zeroRabbit.nackAll(channelName, requeue);
 }
 
 exports.setChannelPrefetch = function setChannelPrefetch(channelName, prefetch) {
