@@ -316,6 +316,8 @@ class ZeroRabbit {
   }
 
   disconnect(callback) {
+    this.channels = new Map();
+    this.consumerTags = new Map();
     this.rabbitConn.close((err) => {
       callback(err);
     })
@@ -345,7 +347,7 @@ class ZeroRabbitMsg {
   }
 }
 
-let zeroRabbit = new ZeroRabbit();
+const zeroRabbit = new ZeroRabbit();
 
 
 /**
@@ -502,5 +504,4 @@ exports.getChannel = function getChannel(channelName, callback) {
 
 exports.disconnect = function disconnect(callback) {
   zeroRabbit.disconnect(callback);
-  zeroRabbit = new ZeroRabbit();
 }
