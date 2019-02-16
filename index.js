@@ -315,59 +315,59 @@ exports.connect = function connect(opts, callback) {
   zeroRabbit.connect(opts, callback);
 }
 
-exports.consume = function consume(channelName, qName, options, callback) {
+exports.consume = function consume(channelName = 'default', qName = 'default.q', options = {}, callback) {
   zeroRabbit.consume(channelName, qName, options, callback);
 };
 
 
-exports.publish = function publish(channelName, exName, JsonMessage, routingKey, options) {
+exports.publish = function publish(channelName = 'default', exName = 'default.ex', JsonMessage = {}, routingKey = '', options = {}) {
   zeroRabbit.publish(channelName, exName, JsonMessage, routingKey, options);
 }
 
-exports.ack = function ack(channelName, message, allUpTo) {
+exports.ack = function ack(channelName = 'default', message = new ZeroRabbitMsg(), allUpTo = false) {
   zeroRabbit.ack(channelName, message, allUpTo);
 }
 
-exports.ackAll = function ackAll(channelName) {
+exports.ackAll = function ackAll(channelName = 'default') {
   zeroRabbit.ackAll(channelName);
 }
 
-exports.nack = function nack(channelName, message, allUpTo, requeue) {
+exports.nack = function nack(channelName = 'default', message = new ZeroRabbitMsg(), allUpTo = false, requeue = true) {
   zeroRabbit.nack(channelName, message, allUpTo, requeue)
 }
 
-exports.nackAll = function nackAll(channelName, requeue) {
+exports.nackAll = function nackAll(channelName = 'default', requeue = true) {
   zeroRabbit.nackAll(channelName, requeue);
 }
 
-exports.setChannelPrefetch = function setChannelPrefetch(channelName, prefetch) {
+exports.setChannelPrefetch = function setChannelPrefetch(channelName = 'default', prefetch = 1) {
   zeroRabbit.setChannelPrefetch(channelName, prefetch);
 }
 
-exports.assertQueue = function assertQueue(channelName, qName, options, callback) {
+exports.assertQueue = function assertQueue(channelName = 'default', qName = 'default.q', options = {}, callback) {
   zeroRabbit.assertQueue(channelName, qName, options, callback);
 }
 
-exports.deleteQueue = function deleteQueue(channelName, qName, options, callback) {
+exports.deleteQueue = function deleteQueue(channelName = 'default', qName = 'default.q', options = {}, callback) {
   zeroRabbit.deleteQueue(channelName, qName, options, callback);
 }
 
-exports.assertExchange = function assertExchange(channelName, exName, type, options, callback) {
+exports.assertExchange = function assertExchange(channelName = 'default', exName = 'default.ex', type = 'fanout', options = {}, callback) {
   zeroRabbit.assertExchange(channelName, exName, type, options, callback)
 }
 
-exports.bindQueue = function bindQueue(channelName, qName, exName, key, options, callback) {
+exports.bindQueue = function bindQueue(channelName = 'default', qName = 'default.q', exName = 'default.ex', key = '', options = {}, callback) {
   zeroRabbit.bindQueue(channelName, qName, exName, key, options, callback);
 }
 
-exports.closeChannel = function closeChannel(channelName) {
+exports.closeChannel = function closeChannel(channelName = 'default') {
   zeroRabbit.closeChannel(channelName);
 }
 
-exports.cancelChannel = function cancelChannel(channelName) {
+exports.cancelChannel = function cancelChannel(channelName = 'default') {
   zeroRabbit.cancelChannel(channelName);
 }
 
-exports.getChannel = function getChannel(channelName, callback) {
+exports.getChannel = function getChannel(channelName = 'default', callback) {
   zeroRabbit.getChannel(channelName, callback);
 }
