@@ -244,7 +244,7 @@ For reference these are mostly wrappers to [https://www.squaremobius.net/amqp.no
 
 In all functions *channel* is a string.  It is always the first argument. It is the name you have given or would like to give to the channel. See important notes at the top for information detailing how channels are created and destroyed.
 
-**IMPORTANT:** The first argument of ***ALL*** zero-rabbit functions (i.e. rabbit.consume() as below) is ***ALWAYS*** the channel on which to perform the specified action.  Again if the channel is not already created via the config object or via a function call, a new channel will be created.
+**IMPORTANT:** The first argument of ***ALL*** zero-rabbit functions is ***ALWAYS*** the channel on which to perform the specified action.  Again if the channel is not already created via the config object or via a function call, a new channel will be created.
 
 **Connect**
 ```javascript
