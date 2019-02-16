@@ -5,6 +5,8 @@ Official 1.0.0 release:
 
     *options* has been moved to the last argument so that it is now optional. This also means that all methods have the identical order to the official amqplib method calls.
 
+    Also JSDoc is now implemented, so code completion should be very very friendly to use.
+
 Zero Rabbit is a RabbitMQ client library.  At it's core it provides a simple abstraction over amqplib. It is fairly well developed however if you find any issues with it please open them up on the github page.  I am actively maintaining this and would like to make it as resilient as possible.
 
 The feature that Zero Rabbit implements that I have not seen in any other RabbitMQ client library is the ability to control which channel you publish/consume on. This is very important for applications that need to listen to more than one queue at a time.
