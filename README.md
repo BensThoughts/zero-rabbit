@@ -218,15 +218,15 @@ rabbit.publish(channel, exchange, message, routingKey, options)
 ```
 *routingKey* and *options* are optional
 
-The msg payload is expected to be a JSON object. The internals of ZeroRabbit will stringify, turn into a Buffer, and then publish/send the message over the wire for you.
+The message payload is expected to be a JSON object. The internals of ZeroRabbit will stringify, turn into a Buffer, and then publish/send the message over the wire for you.
 
 **Consume**
 ```javascript
-rabbit.consume(channel, queue, options, function(msg))
+rabbit.consume(channel, queue, options, function(message))
 ```
 *options* are not optional as of right now, just use {} if you do not want to use any options.
 
-*msg* is a ZeroRabbitMsg (see above for explanation). The JSON decoded msg can be obtained with msg.content or msg.getJsonMsg(), the full rabbit msg can be obtained with msg.msg or msg.getMsg()
+*message* is a ZeroRabbitMsg (see above for explanation). The JSON decoded msg can be obtained with msg.content or msg.getJsonMsg(), the full rabbit msg can be obtained with msg.msg or msg.getMsg()
 
 
 **Set Channel Prefetch**
