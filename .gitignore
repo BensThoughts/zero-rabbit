@@ -2,3 +2,4 @@
 package-lock.json
 zero-rabbit-1.0.6.tgz
 tests/package-lock.json
+tests/node_modules

@@ -241,10 +241,14 @@ class ZeroRabbit {
     ch.prefetch(prefetch);
   }
 
-  async publish(channelName, exName, routingKey, JsonMessage, options = {}) {
+  async publish(channelName, exName, routingKey, JsonMessage, options = {}, callback) {
     let msg = JSON.stringify(JsonMessage);
     let ch = await this.getChannel(channelName);
-    ch.publish(exName, routingKey, Buffer.from(msg), options);
+    ch.publish(exName, routingKey, Buffer.from(msg), options, (err, ok) => {
+      if (callback) {
+        callback(err, ok);
+      }
+    });
   }
 
   async sendToQueue(channelName, qName, JsonMessage, options = {}) {
@@ -375,9 +379,10 @@ exports.consume = function consume(channelName, qName, callback, options = {}) {
  * @param {object} JsonMessage - A JSON compatible object, can be any JS Object
  * @param {string} routingKey - The routing key
  * @param {object} options - Options
+ * @param {function} callback - (err, ok) => {}
  */
-exports.publish = function publish(channelName, exName, routingKey, JsonMessage, options = {}) {
-  zeroRabbit.publish(channelName, exName, routingKey, JsonMessage, options);
+exports.publish = function publish(channelName, exName, routingKey, JsonMessage, options = {}, callback) {
+  zeroRabbit.publish(channelName, exName, routingKey, JsonMessage, options, callback);
 }
 
 /**

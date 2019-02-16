@@ -2,7 +2,7 @@ const expect = require('chai').expect
 
 const rabbit = require('zero-rabbit');
 
-let confWithOptions = {
+const confWithOptions = {
     connection: {
         hostname: 'localhost',
         port: 5672,
@@ -45,7 +45,7 @@ let confWithOptions = {
     ]
 }
 
-let confWithoutOptions = {
+const confWithoutOptions = {
     connection: {
         hostname: 'localhost',
         port: 5672,
@@ -83,7 +83,7 @@ let confWithoutOptions = {
     ]
 }
 
-let confConnectionOnly = {
+const confConnectionOnly = {
     connection: {
         hostname: 'localhost',
         port: 5672,
@@ -142,23 +142,46 @@ describe('Zero Rabbit: ', () => {
             expect(badConnect).to.throw(Error);
         });
     });
-    describe('Publishing: ', () => {
+    describe('Method Tests: ', () => {
         afterEach(() => {
             rabbit.disconnect((err) => {
                 if (err) console.log(err);
             });
         });
-        it('should publish to a queue without options', (done) => {
-            rabbit.connect(confWithoutOptions, (err, conn) => {
-                let message = {
-                    'userId': 'userId',
-                    'token': 'token',
-                    'some_data': ['data1', 'data2', 'data3']
-                }
-                rabbit.publish('test.send.1', 'test.without.options.ex.1', '', message);
-                done();
+        describe('Publishing: ', () => {
+            it('should publish to a queue', (done) => {
+                rabbit.connect(confWithoutOptions, async (err, conn) => {
+                    let message = {
+                        'userId': 'userId',
+                        'token': 'token',
+                        'some_data': ['data1', 'data2', 'data3']
+                    }
+                    rabbit.publish('test.send.1', 'test.without.options.ex.1', '', message, {}, (err, ok) => {
+                        expect(err).to.be.null;
+                        done();
+                    });
+                });
             });
         });
+        describe('Consuming: ', () => {
+            it('should consume from a queue', (done) => {
+                rabbit.connect(confWithoutOptions, async (err, conn) => {
+                    let message = {
+                        'userId': 'userId',
+                        'token': 'token',
+                        'some_data': ['data1', 'data2', 'data3']
+                    }
+                    rabbit.consume('test.listen.1', 'test.without.options.q.1', (msg) => {
+                        if (msg) {
+                            expect(msg.content).to.eql(message)
+                            done();
+                        }
+                    }, { noAck: true });
+                });
+            });
+        });
+        describe('assertQueue: ', () => {
+            
+        });
     });
-
 });
