@@ -78,19 +78,25 @@ class ZeroRabbit {
 
     if (conf.exchanges) {
       await asyncForEach(conf.exchanges, async (exchange) => {
-        await this.assertExchangePromise(exchange.channel, exchange.name, exchange.type, exchange.options);
+        await this.assertExchangePromise(exchange.channel, exchange.name, exchange.type, exchange.options).catch((err) => {
+          throw new Error('Error asserting exchange: ' + err);
+        });
       });
     } 
 
     if (conf.queues) {
       await asyncForEach(conf.queues, async (queue) => {
-        await this.assertQueuePromise(queue.channel, queue.name, queue.options);
+        await this.assertQueuePromise(queue.channel, queue.name, queue.options).catch((err) => {
+          throw new Error('Error asserting queue: ' + err);
+        });
       });
     } 
     
     if (conf.bindings) {
       await asyncForEach(conf.bindings, async (binding) => {
-        await this.bindQueuePromise(binding.channel, binding.queue, binding.exchange, binding.key, binding.options);  
+        await this.bindQueuePromise(binding.channel, binding.queue, binding.exchange, binding.key, binding.options).catch((err) => {
+          throw new Error('Error binding queue: ' + err);
+        });  
       });
     }  
   
@@ -315,7 +321,7 @@ class ZeroRabbit {
   getChannelFromMemory(channelName) {
     let ch = this.channels.get(channelName);
     if (ch === undefined) {
-      throw new Error('Channel "' + channelName + '" was not found!, check your spelling, was the channel created?');
+      throw new Error('Channel "' + channelName + '" was not found!, check your spelling, was the channel created? See https://github.com/SanFranciscoSunrise/zero-rabbit for information about how channels are created');
     }
     return ch;
   }
