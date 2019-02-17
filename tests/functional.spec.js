@@ -180,8 +180,5 @@ describe('Zero Rabbit: ', () => {
                 });
             });
         });
-        describe('assertQueue: ', () => {
-            
-        });
     });
 });
