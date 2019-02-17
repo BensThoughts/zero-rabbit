@@ -277,7 +277,7 @@ rabbit.sendToQueue(channel, queue, message, options)
 rabbit.consume(channel, queue, function(message), options)
 ```
 
-*message* is a ZeroRabbitMsg (see above for explanation). The JSON decoded msg can be obtained with msg.content or msg.getJsonMsg(), the full rabbit msg can be obtained with msg.msg or msg.getMsg()
+*message* is a ZeroRabbitMsg (see above for explanation). The JSON decoded msg can be obtained with msg.content or msg.getJsonMsg(), the full RabbitMQ msg can be obtained with msg.msg or msg.getMsg()
 
 *options* are optional
 
@@ -319,7 +319,7 @@ Be careful with nack, the default *requeue* is true and will cause your app to g
 
 nack is primarily to be used with dead letter exchanges, as in assertQueue dead letter exchange options [https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue](https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue). In general it is better to just ack bad messages. Advanced setups can use nack to deal with errors that are of a temporary nature, such as http connection errors.
 
-Reject a message. This instructs the server to either requeue the message or throw it away (which may result in it being dead-lettered).
+nack() rejects a message. This instructs the server to either requeue the message or throw it away (which may result in it being dead-lettered).
 
 *channel* is the name you gave to the channel, read rabbit.ack() above for more info.
 
@@ -335,7 +335,7 @@ rabbit.nackAll(channel, requeue)
 ```
 Be careful with nackAll() in the same way you need to be careful with nack(), both are really for much more advanced use cases that most people will not have.
 
-Reject all messages outstanding on this channel.
+nackAll() rejects all messages outstanding on this channel.
 
 *channel* is the name you gave to the channel, read rabbit.ack() above for more info.
 
@@ -346,19 +346,19 @@ Reject all messages outstanding on this channel.
 ```javascript
 rabbit.assertExchange(channel, exchange, type, options, function(err, ex))
 ```
-function(err, ex) can be omitted as can options, but if you are asserting an exchange you probably want to make sure it has succeeded before proceeding. Also if you include function(err, q) you need to also include options.
+function(err, ex) can be omitted as can options, but if you are asserting an exchange you probably want to make sure it has succeeded before proceeding. If you include function(err, q) you need to also include options.
 
 **Assert Queue**
 ```javascript
 rabbit.assertQueue(channel, queue, options, function(err, q))
 ```
-function(err, q) can be omitted as can options, but if you are asserting a queue you probably want to make sure it has succeeded before proceeding. Also if you include function(err, q) you need to also include options.
+function(err, q) can be omitted as can options, but if you are asserting a queue you probably want to make sure it has succeeded before proceeding. If you include function(err, q) you need to also include options.
 
 **Bind Queue**
 ```javascript
 rabbit.bindQueue(channel, queue, exchange, key, options, function(err, ok))
 ```
-function(err, ok) can be omitted as can options, but if you are binding a queue you probably want to make sure it has succeeded before proceeding. Also if you include function(err, q) you need to also include options.
+function(err, ok) can be omitted as can options, but if you are binding a queue you probably want to make sure it has succeeded before proceeding. If you include function(err, q) you need to also include options.
 
 *key* is optional and will default to ''. For basic use cases key === routingKey. More advance use cases key === pattern. Check official docs to understand what key is
 
