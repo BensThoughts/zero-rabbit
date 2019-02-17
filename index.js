@@ -257,10 +257,14 @@ class ZeroRabbit {
     });
   }
 
-  async sendToQueue(channelName, qName, JsonMessage, options = {}) {
+  async sendToQueue(channelName, qName, JsonMessage, options = {}, callback) {
     let msg = JSON.stringify(JsonMessage);
     let ch = await this.getChannel(channelName);
-    ch.sendToQueue(qName, Buffer.from(msg), options);
+    ch.sendToQueue(qName, Buffer.from(msg), options, (err, ok) => {
+      if (callback) {
+        callback(err, ok);
+      }
+    });
   }
 
   async consume(channelName, qName, callback, options = {}) {
@@ -396,9 +400,10 @@ exports.publish = function publish(channelName, exName, routingKey, JsonMessage,
  * @param {string} qName - The name of the queue
  * @param {object} JsonMessage - A JSON compatible object, can be any JS Object
  * @param {object} options - Options
+ * @param {function} callback - (err, ok) => {}
  */
-exports.sendToQueue = function sendToQueue(channelName, qName, JsonMessage, options = {}) {
-  zeroRabbit.sendToQueue(channelName, qName, JsonMessage, options);
+exports.sendToQueue = function sendToQueue(channelName, qName, JsonMessage, options = {}, callback) {
+  zeroRabbit.sendToQueue(channelName, qName, JsonMessage, options, callback);
 }
 
 /**
