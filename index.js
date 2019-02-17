@@ -325,7 +325,7 @@ class ZeroRabbit {
     this.consumerTags = new Map();
     this.rabbitConn.close((err) => {
       callback(err);
-    })
+    });
   }
   
 }

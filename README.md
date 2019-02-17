@@ -454,17 +454,17 @@ rabbit.getChannel(channel, function(err, ch))
     rabbit.connect(conf, (err, conn) => {
 
       rabbit.setChannelPrefetch('myapp.listen.1', 1);
-      rabbit.consume('myapp.listen.1', 'myapp.q.1', (msg) => {
-        let JsonContent = msg.content;
-        rabbit.ack('myapp.listen.1', msg);
+      rabbit.consume('myapp.listen.1', 'myapp.q.1', (message1) => {
+        let JsonContent = message1.content;
+        rabbit.ack('myapp.listen.1', message1);
         
         console.log(JsonContent);
       }, { noAck: false });
 
       rabbit.setChannelPrefetch('myapp.listen.2', 1);
-      rabbit.consume('myapp.listen.2', 'myapp.q.2', (msg2) => {
-        let JsonContent2 = msg2.getJsonMsg();
-        rabbit.ack('batch.listen.2', msg2);
+      rabbit.consume('myapp.listen.2', 'myapp.q.2', (message2) => {
+        let JsonContent2 = message2.getJsonMsg();
+        rabbit.ack('batch.listen.2', message2);
         
         console.log(JsonContent2);
       }, { noAck: false });
@@ -517,20 +517,20 @@ rabbit.getChannel(channel, function(err, ch))
 
       rabbit.setChannelPrefetch('myapp.listen.1', 1);
       
-      rabbit.consume('myapp.listen.1', 'myapp.q.1', (msg) => {
-        let userId = msg.content.userId;
-        let access_token = msg.content.access_token;
-        let some_data = msg.content.some_data;
+      rabbit.consume('myapp.listen.1', 'myapp.q.1', (message) => {
+        let userId = message.content.userId;
+        let access_token = message.content.access_token;
+        let some_data = message.content.some_data;
         
         let transformed_data = do_something_with_some_data(userId, access_token, some_data);
         
-        let transformed_message = {
+        let transformed_data_message = {
             userId: userId,
             access_token: access_token,
             some_data: transformed_data
         }
 
-        rabbit.publish('myapp.send.1', 'myapp.ex.1', '', transformed_message);
+        rabbit.publish('myapp.send.1', 'myapp.ex.1', '', transformed_data_message);
 
       }, { noAck: true });
 
