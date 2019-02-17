@@ -111,7 +111,7 @@ If your app only consumes from a single queue you can actually just use one chan
 
 
 # Zero Rabbit Msg:
-The msg object that pops out of rabbit.consume is a special little object called a ZeroRabbitMsg.  
+The *msg* object that pops out of rabbit.consume(*...*) is a special little object called a ZeroRabbitMsg.  
 
 Within a ZeroRabbitMsg there exists two properties:
 
@@ -178,9 +178,9 @@ Within a ZeroRabbitMsg there exists two properties:
 
 You only need to connect once somewhere in your main module. Once you have connected you can publish anywhere in your app.
 
-*const rabbit = require('zero-rabbit')* and then *rabbit.publish()*.
+*const rabbit = require('zero-rabbit')* and then *rabbit.publish(..)*.
 
-The message payload that rabbit.publish(*channel*, *exchange*, *message*, ...) expects is any plain Javascript object. The internals of ZeroRabbit will stringify, turn it into a Buffer, and then publish the message over the wire for you.
+The *message* payload that rabbit.publish(*channel*, *exchange*, *message*, ...) expects is any plain Javascript object. The internals of ZeroRabbit will stringify, turn it into a Buffer, and then publish the message over the wire for you.
 
 
 **Receiving (Subscribing):**
@@ -277,7 +277,7 @@ rabbit.sendToQueue(channel, queue, message, options)
 rabbit.consume(channel, queue, function(message), options)
 ```
 
-*message* is a ZeroRabbitMsg (see above for explanation). The JSON decoded msg can be obtained with msg.content or msg.getJsonMsg(), the full RabbitMQ msg can be obtained with msg.msg or msg.getMsg()
+*message* is a ZeroRabbitMsg (see above for explanation). The JSON decoded msg can be obtained with message.content or message.getJsonMsg(), the full RabbitMQ msg can be obtained with message.msg or message.getMsg()
 
 *options* are optional
 
