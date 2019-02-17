@@ -180,7 +180,7 @@ You only need to connect once somewhere in your main module. Once you have conne
 
 *const rabbit = require('zero-rabbit')* and then *rabbit.publish()*.
 
-The msg payload that rabbit.publish(*channel*, *exchange*, *msg*, ...) expects is any plain Javascript object. The internals of ZeroRabbit will stringify, turn into a Buffer, and then publish the message over the wire for you.
+The message payload that rabbit.publish(*channel*, *exchange*, *message*, ...) expects is any plain Javascript object. The internals of ZeroRabbit will stringify, turn it into a Buffer, and then publish the message over the wire for you.
 
 
 **Receiving (Subscribing):**
