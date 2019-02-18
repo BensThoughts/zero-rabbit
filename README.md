@@ -239,7 +239,7 @@ See below for more complicated examples.
 
 # Methods:
 
-For reference these are mostly wrappers to [https://www.squaremobius.net/amqp.node/channel_api.html](https://www.squaremobius.net/amqp.node/channel_api.html). 
+For reference these are mostly wrappers to <a href="https://www.squaremobius.net/amqp.node/channel_api.html" target="_blank">https://www.squaremobius.net/amqp.node/channel_api.html</a>. 
 
 
 **IMPORTANT:** The first argument of ***ALL*** zero-rabbit functions (*with the exception of rabbit.connect(*...*)*) is ***ALWAYS*** the channel name (a string) on which to perform the specified action.  Again if the channel is not already created via the config object or via a function call, a new channel will be created. See important notes at the top for information detailing how channels are created and destroyed.
@@ -256,7 +256,7 @@ rabbit.publish(channel, exchange, routingKey, message, options)
 
 *routingKey* is the routingKey
 
-*message* is any JSON compatible Object. The message payload is expected to be a JSON compatible object. The internals of ZeroRabbit will stringify, turn into a Buffer, and then publish/send the message over the wire for you.
+*message* is any JSON compatible Object. The message payload is expected to be a plain JS object. The internals of ZeroRabbit will stringify, turn into a Buffer, and then publish/send the message over the wire for you.
 
 *options* is optional
 
@@ -317,7 +317,7 @@ rabbit.nack(channel, message, allUpTo, requeue)
 
 Be careful with nack, the default *requeue* is true and will cause your app to go into a loop if there is only one instance of it consuming from the queue, even if you do have multiple apps this may cause a nasty looping effect.
 
-nack is primarily to be used with dead letter exchanges, as in assertQueue dead letter exchange options [https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue](https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue). In general it is better to just ack bad messages. Advanced setups can use nack to deal with errors that are of a temporary nature, such as http connection errors.
+nack is primarily to be used with dead letter exchanges, as in assertQueue dead letter exchange options <a href="https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue" target="_blank">https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue</a> In general it is better to just ack bad messages. Advanced setups can use nack to deal with errors that are of a temporary nature, such as http connection errors.
 
 nack() rejects a message. This instructs the server to either requeue the message or throw it away (which may result in it being dead-lettered).
 
@@ -358,9 +358,9 @@ function(err, q) can be omitted as can options, but if you are asserting a queue
 ```javascript
 rabbit.bindQueue(channel, queue, exchange, key, options, function(err, ok))
 ```
-function(err, ok) can be omitted as can options, but if you are binding a queue you probably want to make sure it has succeeded before proceeding. If you include function(err, q) you need to also include options.
+function(err, ok) can be omitted as can options, but if you are binding a queue you probably want to make sure it has succeeded before proceeding. If you include function(err, q) you need to also include options and key.
 
-*key* is optional and will default to ''. For basic use cases key === routingKey. More advance use cases key === pattern. Check official docs to understand what key is
+*key* is optional and will default to ''. For basic use cases key === routingKey. More advance use cases key === pattern. Check official docs to understand what key is.
 
 
 **Delete Queue**
@@ -391,7 +391,7 @@ rabbit.getChannel(channel, function(err, ch))
 
 *channel* is the name of the channel
 
-*ch* is the actual channel object as found in amqplib (this will be a confirm channel), the same one that can be found here [https://www.squaremobius.net/amqp.node/channel_api.html#confirmchannel](https://www.squaremobius.net/amqp.node/channel_api.html#confirmchannel)
+*ch* is the actual channel object as found in amqplib (this will be a confirm channel), the same one that can be found here <a href="https://www.squaremobius.net/amqp.node/channel_api.html#confirmchannel" target="_blank">https://www.squaremobius.net/amqp.node/channel_api.html#confirmchannel</a>
 
 *getChannel()* will retrieve the channel object from memory.  If the channel has not been created previously (via config or another rabbit function call) it will create a new channel, store it in memory, and then give you back the channel object.
 
