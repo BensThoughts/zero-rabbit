@@ -4,6 +4,8 @@ Zero Rabbit is a RabbitMQ client library.  At it's core it provides a simple abs
 
 The feature that Zero Rabbit implements that I have not seen in any other RabbitMQ client library is the ability to control which channel you publish/consume on. This is very important for applications that need to listen to more than one queue at a time.
 
+Technically you can listen to two queues at the same time on a single channel, I however do not recommend this as it can be somewhat error prone, and if you have no control over which channel you are acking on it is definitely going to lead to errors.  Hence, Zero Rabbit to control the channels yourself.
+
 # Official 1.0.4 release:
 
 **Consume is now:** 
@@ -398,7 +400,7 @@ rabbit.getChannel(channel, function(err, ch))
 
 # Complicated examples:
 
-**Example of Receiving from two queues at the same time**
+**Example of Receiving from two queues at the same time on two different channels**
 
 ```javascript
     const rabbit = require('zero-rabbit');
