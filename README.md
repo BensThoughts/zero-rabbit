@@ -363,7 +363,7 @@ rabbit.bindQueue(channel, queue, exchange, key, options, function(err, ok))
 function(err, ok) can be omitted as can options, but if you are binding a queue you probably want to make sure it has succeeded before proceeding. If you include function(err, q) you need to also include options and key.
 
 *key* is optional and will default to ''. For basic use cases key === routingKey. More advance use cases key === pattern. Check official docs to understand what key is.
-
+[https://www.rabbitmq.com/tutorials/tutorial-five-javascript.html](https://www.rabbitmq.com/tutorials/tutorial-five-javascript.html)
 
 **Delete Queue**
 ```javascript
