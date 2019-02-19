@@ -315,9 +315,9 @@ Acknowledge all outstanding messages on the channel. This is a “safe” operat
 rabbit.nack(channel, message, allUpTo, requeue)
 ```
 
-Be careful with nack, the default *requeue* is true and will cause your app to go into a loop if there is only one instance of it consuming from the queue, even if you do have multiple apps this may cause a nasty looping effect.
+Be careful with nack, the default *requeue* is true and could cause your app to go into a loop.
 
-nack is primarily to be used with dead letter exchanges, as in assertQueue dead letter exchange options <a href="https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue" target="_blank">https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue</a> In general it is better to just ack bad messages. Advanced setups can use nack to deal with errors that are of a temporary nature, such as http connection errors.
+nack is primarily to be used with dead letter exchanges, as in assertQueue dead letter exchange options <a href="https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue" target="_blank">https://www.squaremobius.net/amqp.node/channel_api.html#channel_assertQueue</a> In general it is better to just ack bad messages and log the error. Advanced setups can use nack to deal with errors that are of a temporary nature, such as http connection errors.
 
 nack() rejects a message. This instructs the server to either requeue the message or throw it away (which may result in it being dead-lettered).
 
