@@ -39,8 +39,8 @@ class ZeroRabbit {
 
     amqp.connect(connection, (err, conn) => {
       if (err) {
-        if (cb) {
-          cb(err, undefined);
+        if (callback) {
+          callback(err, undefined);
         } else {
           throw new Error('Error creating connection: ' + err);
         }
