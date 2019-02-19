@@ -4,8 +4,6 @@ Zero Rabbit is a RabbitMQ client library.  At it's core it provides a simple abs
 
 The feature that Zero Rabbit implements that I have not seen in any other RabbitMQ client library is the ability to control which channel you publish/consume on. This is very important for applications that need to listen to more than one queue at a time.
 
-Technically you can listen to two queues at the same time on a single channel, I however do not recommend this as it can be somewhat error prone, and if you have no control over which channel you are acking on it is definitely going to lead to errors.  Hence, Zero Rabbit to control the channels yourself.
-
 # Official 1.0.4 release:
 
 **Consume is now:** 
@@ -99,7 +97,7 @@ Optionally you can include a url parameter instead of the connection object abov
 Technically a url string or connection object is the only required parameter of a conf object.
 
 
-**Note:** You MUST declare a channel for all queues, exchanges, and bindings...This is actually a benefit as you will see (It allows you to consume off of multiple queues at the same time).
+**Note:** You MUST declare a channel for all queues, exchanges, and bindings...This is actually a benefit as you will see (It allows you to safely consume off of multiple queues at the same time).
 
 **IMPORTANT:** channels are created idempotently and automatically within all function calls and config object declarations, with the *exception* of rabbit.ack(*...*), rabbit.ackAll(*...*), rabbit.nack(*...*), rabbit.nackAll(*...*), rabbit.closeChannel(*...*), and rabbit.cancelChannel(*...*).  This means that if you misspell a channel name somewhere later on in your code it will result in the creation of a new channel as well as possibly unexpected behavior.
 
