@@ -334,7 +334,9 @@ class ZeroRabbit {
     this.channels = new Map();
     this.consumerTags = new Map();
     this.rabbitConn.close((err) => {
-      callback(err);
+      if (callback) {
+        callback(err);
+      }
     });
   }
   
