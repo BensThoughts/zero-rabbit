@@ -159,6 +159,7 @@ describe('Zero Rabbit: ', () => {
             }
             badConnect((err, conn) => {
                 expect(err.errno).to.exist;
+                console.log(err.erno);
                 expect(err.errno).to.eql('ENOTFOUND');
                 done();
             });
