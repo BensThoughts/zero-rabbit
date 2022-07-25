@@ -590,8 +590,7 @@ npm run test
 Don't forget to run `npm i` to install the packages locally before running `npm run test`
 
 _Note: Some of the tests that test an error should get thrown with a bad
-connection config may fail due to time out if your computer is having network
-issues, they will pass if tried a couple of times_
+connection config may fail due to time out, they will pass if tried a couple of times_
 
 ---
 
