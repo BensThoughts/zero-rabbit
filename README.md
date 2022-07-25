@@ -589,6 +589,10 @@ npm run test
 
 Don't forget to run `npm i` to install the packages locally before running `npm run test`
 
+_Note: Some of the tests that test an error should get thrown with a bad
+connection config may fail due to time out if your computer is having network
+issues, they will pass if tried a couple of times_
+
 ---
 
 In my own code I have utilized Zero Rabbit to dynamically create queues for batch jobs submitted by users such that each user gets their own queue until the batch job is completed (and then their queue is deleted). This has allowed for a single running instance of my app to handle multiple jobs from different users at the same time without holdup. So if a user submits a job that takes 2 minutes and then another user submits a job that takes 5 seconds a single instance of my app can process the 5 second job at the same time as the 2 minute job and not hold up users who have shorter jobs.
