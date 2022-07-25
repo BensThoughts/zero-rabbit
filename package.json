@@ -1,6 +1,6 @@
 {
   "name": "zero-rabbit",
-  "version": "1.1.1",
+  "version": "1.1.0",
   "description": "Zero Inbox client library for RabbitMQ",
   "main": "index.js",
   "homepage": "https://github.com/BensThoughts/zero-rabbit",
